@@ -1,0 +1,9 @@
+{
+	// not_on_caret = 不會清掉你游標正停著那一行的空白，打字時不會被打斷
+	"trim_trailing_white_space_on_save": "not_on_caret",
+	"ensure_newline_at_eof_on_save": true,
+
+	"tab_size": 4,
+	"translate_tabs_to_spaces": true,
+	"rulers": [88],
+}

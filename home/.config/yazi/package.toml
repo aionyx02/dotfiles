@@ -1,0 +1,34 @@
+[[plugin.deps]]
+use = "yazi-rs/plugins:git"
+rev = "56d6277"
+hash = "b94720e0ef40cb0e97093fabd9694775"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:smart-enter"
+rev = "56d6277"
+hash = "2ede7b0f1beade8390be1b52cfed6a49"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:smart-filter"
+rev = "56d6277"
+hash = "21de6e2a801fc8960038ff8a533f24c0"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:smart-paste"
+rev = "56d6277"
+hash = "e44dcc831ee62d5f79a1f8130cfdc847"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:mime-ext"
+rev = "56d6277"
+hash = "47214e328ba8d5fa1a20e05cedd48deb"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:toggle-pane"
+rev = "56d6277"
+hash = "c6b793c9badd85e9c992f41b449d02c5"
+
+[[flavor.deps]]
+use = "BennyOe/tokyo-night"
+rev = "8e6296f"
+hash = "49258e379077f4b0d2e62dfdb131c7d"

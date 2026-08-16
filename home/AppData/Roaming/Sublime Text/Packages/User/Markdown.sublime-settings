@@ -1,0 +1,18 @@
+{
+	// ★ 最重要的一行：Markdown 行尾的兩個空白是「強制換行」語法。
+	//   絕對不能開自動去除尾隨空白，否則會默默改壞講義排版。
+	"trim_trailing_white_space_on_save": "none",
+
+	// 寫作用：自動換行，跟著視窗寬度走
+	"word_wrap": true,
+	"wrap_width": 0,
+	"rulers": [],
+
+	// 中英夾雜的技術講義，英文拼字檢查只會滿江紅 → 關閉
+	// 想臨時開啟：F6
+	"spell_check": false,
+
+	"tab_size": 2,
+	"translate_tabs_to_spaces": true,
+	"ensure_newline_at_eof_on_save": true,
+}

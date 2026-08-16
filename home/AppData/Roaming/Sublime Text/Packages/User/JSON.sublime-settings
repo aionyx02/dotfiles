@@ -1,0 +1,10 @@
+{
+	// 設定檔（.claude/settings.json、package.json…）：存檔自動清尾隨空白
+	// 這裡開啟是安全的 —— JSON 的空白沒有語意
+	"trim_trailing_white_space_on_save": "all",
+	"ensure_newline_at_eof_on_save": true,
+
+	"tab_size": 2,
+	"translate_tabs_to_spaces": true,
+	"word_wrap": false,
+}

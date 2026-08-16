@@ -1,0 +1,17 @@
+[
+	// ── Markdown 預覽 ──────────────────────────────────────────
+	// Alt+M：用瀏覽器開啟預覽（只在 Markdown 檔案裡生效，不會污染其他語言）
+	{
+		"keys": ["alt+m"],
+		"command": "markdown_preview",
+		"args":
+		{
+			"target": "browser",
+			"parser": "markdown",
+		},
+		"context":
+		[
+			{ "key": "selector", "operator": "equal", "operand": "text.html.markdown" },
+		],
+	},
+]

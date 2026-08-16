@@ -1,0 +1,94 @@
+{
+	// ── 字型與版面 ─────────────────────────────────────────────
+	// JetBrains Mono NL = 無連字版本，避免 != => 在設定檔裡被畫成符號
+	"font_face": "JetBrains Mono NL",
+	"font_size": 15,
+	"line_padding_top": 1,
+	"line_padding_bottom": 2,
+
+	// ── 配色 ───────────────────────────────────────────────────
+	// 自製，色值同步自 wezterm.lua 的 Tokyo Night
+	"color_scheme": "Packages/User/Tokyo Night.sublime-color-scheme",
+	// Adaptive 會從「配色方案的背景色」推導整個 UI 的顏色，
+	// 所以上下 bar、側邊欄會自動跟著 Tokyo Night 走，不會出現灰底配深藍編輯區。
+	// （Default Dark 有自己一套獨立灰階，那才是顏色對不上的原因。）
+	// 細部微調在 Packages/User/Adaptive.sublime-theme
+	"theme": "Adaptive.sublime-theme",
+
+	// ── symlink 安全（★ 這條是必要的，不是偏好）─────────────────
+	// Sublime 預設的 atomic save 是「寫暫存檔 → rename 蓋過去」。
+	// rename 蓋掉的是「symlink 本身」而不是它指向的目標，所以只要用 Sublime
+	// 存過一次 ~/.config/... 底下的檔，那條 link 就會被默默換成實體檔案——
+	// 之後在 dotfiles repo 裡改就再也不會生效，而且 git status 毫無反應。
+	// 關掉它。非原子寫入的風險（寫到一半崩潰）對這些小檔 + 有 git 的情況可以接受。
+	// 相關：dotfiles repo 的 install.ps1 -Verify 會抓出被打斷的 link。
+	"atomic_save": false,
+
+	// ── 視覺輔助（純顯示，不改動檔案內容）───────────────────────
+	"highlight_line": true,
+	"highlight_modified_tabs": true,
+	"caret_style": "phase",
+	"scroll_past_end": true,
+	"draw_white_space": ["selection", "trailing"],
+
+	// ── 上方：分頁列 ───────────────────────────────────────────
+	// 方角分頁，與 WezTerm 的 powerline 色塊風格一致
+	"file_tab_style": "square",
+	// 分頁的 ✕ 保留（曾關掉，造成困擾已還原）
+	"show_tab_close_buttons": true,
+	// 明寫確保選單列與標題列都在，避免被其他設定或佈景影響
+	"menu_visible": true,
+	"themed_title_bar": true,
+
+	// ── 下方：狀態列 ───────────────────────────────────────────
+	// 這兩項 Sublime 預設是關的，但對你特別重要：
+	//   show_encoding    → 中文檔案開成 Big5 會亂碼，這是唯一的即時線索
+	//   show_line_endings→ CRLF 混進 git repo 會造成「整檔皆變」的假 diff
+	"show_encoding": true,
+	"show_line_endings": true,
+	"show_line_column": "enabled",
+	"show_indentation": true,
+	"show_git_status": true,
+	"show_git_status_in_status_bar": true,
+	"auto_hide_status_bar": false,
+
+	// ── 索引與搜尋效能 ─────────────────────────────────────────
+	// D:\Project\python 有 27 萬+ 檔案，沒有這些排除規則
+	// Goto Anything (Ctrl+P) 會被 node_modules 灌爆
+	"index_files": true,
+	"goto_anything_exclude_gitignore": true,
+
+	"folder_exclude_patterns":
+	[
+		".svn", ".git", ".hg", "CVS", ".Trash", ".Trash-*",
+		"node_modules",
+		"__pycache__",
+		".venv", "venv", "env",
+		"site-packages",
+		".mypy_cache", ".pytest_cache", ".ruff_cache",
+		"dist", "build", ".next", "out",
+		".idea",
+		"target",
+	],
+
+	"binary_file_patterns":
+	[
+		"*.jpg", "*.jpeg", "*.png", "*.gif", "*.ttf", "*.tga",
+		"*.dds", "*.ico", "*.eot", "*.pdf", "*.swf", "*.jar", "*.zip",
+		"*.pyc", "*.pyo", "*.exe", "*.dll", "*.obj", "*.o", "*.a", "*.lib",
+		"*.map", "*.min.js", "*.min.css",
+	],
+
+	"index_exclude_patterns":
+	[
+		"*.log",
+		"*.min.js", "*.min.css", "*.map",
+		"*.pyc",
+	],
+
+	// ── 既有設定，保留 ─────────────────────────────────────────
+	"ignored_packages":
+	[
+		"Vintage",
+	],
+}

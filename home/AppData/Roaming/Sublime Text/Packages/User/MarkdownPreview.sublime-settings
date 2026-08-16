@@ -1,0 +1,58 @@
+{
+	// 離線渲染，不呼叫 GitHub API：不需網路、沒有 60 次/小時的速率限制
+	"parser": "markdown",
+
+	// 貼近 HackMD (GFM) 的擴充功能
+	"enable_highlight": true,
+	"markdown_extensions":
+	[
+		"markdown.extensions.abbr",
+		"markdown.extensions.attr_list",
+		"markdown.extensions.def_list",
+		"markdown.extensions.footnotes",
+		"markdown.extensions.tables",
+		"markdown.extensions.toc",
+		{
+			"markdown.extensions.admonition": {},
+		},
+		{
+			"markdown.extensions.codehilite":
+			{
+				"guess_lang": false,
+			},
+		},
+		{
+			"pymdownx.superfences": {},
+		},
+		{
+			"pymdownx.magiclink": {},
+		},
+		{
+			"pymdownx.tasklist":
+			{
+				"custom_checkbox": true,
+			},
+		},
+		{
+			"pymdownx.tilde": {},
+		},
+		{
+			"pymdownx.caret": {},
+		},
+	],
+
+	// 中文講義：CJK 字型 fallback，避免預覽出現豆腐字
+	"css":
+	[
+		"default",
+	],
+	"allow_css_overrides": true,
+
+	// 存檔時自動更新已開啟的預覽分頁
+	"enable_autoreload": true,
+
+	// 預覽輸出到暫存檔，不會在你的專案資料夾留下 .html 垃圾
+	"build_action": "browser",
+	"image_path_conversion": "absolute",
+	"file_path_conversions": "absolute",
+}

@@ -1,0 +1,77 @@
+{
+    "cmd": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+        "-Mode",
+        "BuildRun",
+        "$file"
+    ],
+    "file_regex": "^(.*?):([0-9]+):([0-9]+):\\s*(.*)$",
+    "working_dir": "$file_path",
+    "selector": "source.c++",
+    "encoding": "utf-8",
+    "path": "C:\\Program Files\\mingw64\\bin;%PATH%",
+    "variants":
+    [
+        {
+            "name": "Compile Only",
+            "cmd": [
+                "powershell.exe",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+                "-Mode",
+                "Compile",
+                "$file"
+            ]
+        },
+        {
+            "name": "Run Only",
+            "cmd": [
+                "powershell.exe",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+                "-Mode",
+                "RunOnly",
+                "$file"
+            ]
+        },
+        {
+            "name": "Compile and Run in Terminal",
+            "cmd": [
+                "powershell.exe",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+                "-Mode",
+                "Terminal",
+                "$file"
+            ]
+        },
+        {
+            "name": "Run Only in Terminal",
+            "cmd": [
+                "powershell.exe",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+                "-Mode",
+                "RunOnlyTerminal",
+                "$file"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,223 @@
+{
+	"name": "Tokyo Night",
+	// 色值直接取自 C:\Users\shawn\.config\wezterm\wezterm.lua 的 config.color_schemes['Tokyo Night']
+	// 目的：WezTerm 與 Sublime 完全同色。日後改動終端機色盤時，這裡要一起改。
+	"author": "generated to match wezterm.lua",
+
+	"variables":
+	{
+		// ── 來自 wezterm.lua 的原始值 ──
+		"bg":          "#1a1b26",
+		"fg":          "#a9b1d6",
+		"cursor":      "#c0caf5",
+		"selection":   "#33467c",
+		"black":       "#414868",
+		"comment":     "#565f89",
+		"red":         "#f7768e",
+		"green":       "#73daca",
+		"yellow":      "#e0af68",
+		"blue":        "#7aa2f7",
+		"purple":      "#bb9af7",
+		"cyan":        "#7dcfff",
+		"white":       "#c0caf5",
+
+		// ── 由上述色值推導的輔助色（UI 用，非語法著色）──
+		"line_hl":     "#24283b",
+		"gutter_fg":   "#3b4261",
+		"guide":       "#292e42",
+	},
+
+	"globals":
+	{
+		"background":                  "var(bg)",
+		"foreground":                  "var(fg)",
+		"caret":                       "var(cursor)",
+		"block_caret":                 "var(cursor)",
+		"line_highlight":              "var(line_hl)",
+		"selection":                   "var(selection)",
+		"selection_border":            "var(selection)",
+		"inactive_selection":          "color(var(selection) alpha(0.5))",
+		"selection_corner_style":      "round",
+		"highlight":                   "var(yellow)",
+		"find_highlight":              "var(yellow)",
+		"find_highlight_foreground":   "var(bg)",
+		"gutter":                      "var(bg)",
+		"gutter_foreground":           "var(gutter_fg)",
+		"line_diff_width":             "3",
+		"line_diff_added":             "var(green)",
+		"line_diff_modified":          "var(yellow)",
+		"line_diff_deleted":           "var(red)",
+		"guide":                       "var(guide)",
+		"active_guide":                "var(black)",
+		"stack_guide":                 "var(guide)",
+		"brackets_options":            "underline",
+		"brackets_foreground":         "var(cyan)",
+		"bracket_contents_options":    "underline",
+		"bracket_contents_foreground": "var(cyan)",
+		"tags_options":                "stippled_underline",
+		"shadow":                      "color(var(bg) alpha(0.6))",
+		"misspelling":                 "var(red)",
+		"accent":                      "var(blue)",
+	},
+
+	"rules":
+	[
+		{
+			"name": "Comment",
+			"scope": "comment, punctuation.definition.comment",
+			"foreground": "var(comment)",
+			"font_style": "italic",
+		},
+		{
+			"name": "String",
+			"scope": "string, punctuation.definition.string",
+			"foreground": "var(green)",
+		},
+		{
+			"name": "Number / Constant",
+			"scope": "constant.numeric, constant.language, constant.character",
+			"foreground": "var(yellow)",
+		},
+		{
+			"name": "Escape sequence",
+			"scope": "constant.character.escape",
+			"foreground": "var(cyan)",
+		},
+		{
+			"name": "Keyword",
+			"scope": "keyword, keyword.control, storage.type, storage.modifier",
+			"foreground": "var(purple)",
+		},
+		{
+			"name": "Operator",
+			"scope": "keyword.operator, punctuation.separator, punctuation.terminator",
+			"foreground": "var(cyan)",
+		},
+		{
+			"name": "Function",
+			"scope": "entity.name.function, support.function, variable.function",
+			"foreground": "var(blue)",
+		},
+		{
+			"name": "Function parameter",
+			"scope": "variable.parameter",
+			"foreground": "var(fg)",
+		},
+		{
+			"name": "Class / Type",
+			"scope": "entity.name.class, entity.name.type, entity.name.struct, support.class, support.type",
+			"foreground": "var(cyan)",
+		},
+		{
+			"name": "Variable",
+			"scope": "variable, variable.other",
+			"foreground": "var(fg)",
+		},
+		{
+			"name": "Member / Property",
+			"scope": "variable.other.member, meta.property.object",
+			"foreground": "var(blue)",
+		},
+		{
+			"name": "Tag",
+			"scope": "entity.name.tag",
+			"foreground": "var(red)",
+		},
+		{
+			"name": "Tag attribute",
+			"scope": "entity.other.attribute-name",
+			"foreground": "var(purple)",
+		},
+		{
+			"name": "Invalid",
+			"scope": "invalid",
+			"foreground": "var(red)",
+		},
+		{
+			"name": "Invalid deprecated",
+			"scope": "invalid.deprecated",
+			"foreground": "var(bg)",
+			"background": "var(red)",
+		},
+
+		// ── JSON / YAML 設定檔：鍵名要一眼可辨 ──
+		{
+			"name": "JSON / YAML key",
+			"scope": "meta.mapping.key string, entity.name.tag.yaml, support.type.property-name",
+			"foreground": "var(blue)",
+		},
+
+		// ── Markdown：你的主要用途，特別調校 ──
+		{
+			"name": "Markdown 標題",
+			"scope": "markup.heading, entity.name.section",
+			"foreground": "var(blue)",
+			"font_style": "bold",
+		},
+		{
+			"name": "Markdown 標題 # 符號",
+			"scope": "punctuation.definition.heading",
+			"foreground": "var(comment)",
+		},
+		{
+			"name": "Markdown 粗體",
+			"scope": "markup.bold",
+			"foreground": "var(yellow)",
+			"font_style": "bold",
+		},
+		{
+			"name": "Markdown 斜體",
+			"scope": "markup.italic",
+			"foreground": "var(purple)",
+			"font_style": "italic",
+		},
+		{
+			"name": "Markdown 刪除線",
+			"scope": "markup.strikethrough",
+			"foreground": "var(comment)",
+			"font_style": "italic",
+		},
+		{
+			"name": "Markdown 行內程式碼 / 程式碼區塊",
+			"scope": "markup.raw.inline, markup.raw.block, markup.raw.code-fence",
+			"foreground": "var(green)",
+		},
+		{
+			"name": "Markdown 引用",
+			"scope": "markup.quote",
+			"foreground": "var(comment)",
+			"font_style": "italic",
+		},
+		{
+			"name": "Markdown 連結文字",
+			"scope": "meta.link string.other.link, string.other.link",
+			"foreground": "var(cyan)",
+		},
+		{
+			"name": "Markdown 網址",
+			"scope": "markup.underline.link",
+			"foreground": "var(cyan)",
+			"font_style": "underline",
+		},
+		{
+			"name": "Markdown 清單符號",
+			"scope": "markup.list punctuation.definition.list_item, punctuation.definition.list_item",
+			"foreground": "var(red)",
+		},
+		{
+			"name": "Markdown 分隔線",
+			"scope": "meta.separator",
+			"foreground": "var(black)",
+		},
+		{
+			"name": "Markdown 表格框線",
+			"scope": "punctuation.separator.table-cell, punctuation.section.table-header",
+			"foreground": "var(black)",
+		},
+		{
+			"name": "Markdown YAML front matter",
+			"scope": "meta.frontmatter",
+			"background": "var(guide)",
+		},
+	],
+}

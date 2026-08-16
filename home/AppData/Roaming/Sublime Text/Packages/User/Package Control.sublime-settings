@@ -1,0 +1,19 @@
+{
+	"bootstrapped": true,
+	"installed_packages":
+	[
+		"A File Icon",
+		"AutoFileName",
+		"CppFastOlympicCoding",
+		"GitGutter",
+		"HDL Syntax Highlighting",
+		"MarkdownPreview",
+		"Package Control",
+		"Python 3",
+		"SideBarEnhancements",
+		"Terminal",
+	],
+	"in_process_packages":
+	[
+	],
+}

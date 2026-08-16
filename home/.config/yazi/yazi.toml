@@ -1,0 +1,101 @@
+# =====================================================================
+#  Yazi 主設定  ·  Windows 主用 / WSL 共用
+#  設定刻意寫成跨平台：openers 用 for = "windows" / "unix" 分流，
+#  之後在 WSL 執行 ln -s 指到這個目錄即可直接生效，不需要維護第二份。
+#
+#  未在此列出的項目一律沿用 yazi 預設（ratio、排序、隱藏檔、linemode…）。
+#  預設值可在 https://github.com/sxyazi/yazi/blob/main/yazi-config/preset/ 查閱。
+# =====================================================================
+
+# ---------------------------------------------------------------------
+# 預覽品質
+# ---------------------------------------------------------------------
+# WezTerm 走 kitty graphics protocol、DPI 固定 120，吃得下比預設更高的解析度。
+# 預設的 600x900 在此螢幕上會被拉伸，quality 75 的壓縮痕跡看照片時肉眼可見。
+#
+# ★ image_filter 刻意「不」改成 lanczos3：
+#   畫質提升的主因是解析度(像素量 ~3.5x)，lanczos3 只多換到一點邊緣銳利度，
+#   卻要付 3-5 倍的濾波成本(6-tap vs 2-tap)。維持 triangle 是投入產出比最好的點。
+#
+# 註：toggle-pane(T 鍵) 把預覽撐成全寬時，這兩個上限才是實際畫質的天花板。
+#
+# ★ image_delay 必須跟著上面三個值一起調高，否則畫質的代價會變成滾動時的卡頓。
+#   官方定義：「送出圖片預覽資料前至少等待幾毫秒」，預設 30 是配著
+#   600x900 / quality 75 訂的。這裡像素量是預設的 3.5 倍、又把 JPEG 品質
+#   拉到 90，單張成本高出一截，30ms 的節流閥就不夠了 —
+#   Windows 預設按鍵重複率約 30 次/秒 ≈ 33ms 一格，剛好壓在門檻之上，
+#   等於壓著方向鍵滾過相簿時幾乎每一格都完整跑一輪
+#   「解碼 → 縮放 → q90 編碼 → base64 → 寫進終端機」。
+#
+# ★ 值域是 0–100，不是任意整數。官方文件只寫語意、沒寫上限。
+#   ★ 這個錯誤的代價遠大於「一個值被忽略」：yazi 會印
+#     「Press <Enter> to continue with preset settings...」然後整組使用者設定
+#     退回預設 — 包含 keymap.toml。所以症狀不是「圖片預覽怪怪的」，
+#     而是所有自訂鍵位一起失效(2026-08-09 填 200 時實際踩到，F2/F3/F4 全無反應)。
+#     日後改任何 yazi.toml 的值之後，第一件事就是看 yazi 啟動時有沒有這行提示。
+#   取上限 100，是這個選項能給的最大節流量，仍是預設 30 的 3.3 倍。
+[preview]
+max_width     = 1200
+max_height    = 1600
+image_quality = 90
+image_delay   = 100
+
+# ---------------------------------------------------------------------
+# 開啟方式
+# ---------------------------------------------------------------------
+# 只覆寫 edit 這一條，其餘(open / play / reveal / extract / trash …)全部沿用預設。
+# 預設已內建的、不需要自己設的：
+#   reveal  = explorer /select,%s1   → 在檔案總管中選取
+#   extract = ya pub extract         → 解壓(靠 7-Zip)
+#   trash   = ya pub trash-restore   → 回收桶瀏覽與還原
+[opener]
+# ★ 清單第一條就是 Enter / o 的預設；nvim 排在最後，要用它得按 O 從選單挑。
+#   nvim 必須 block = true — 它是 TUI，要接管整個終端；照 subl 那樣寫 orphan
+#   會讓它在背景搶同一個畫面，看起來就像 yazi 壞掉。
+#
+# ★★ nvim 那條「不能」排在 subl -w 前面 —— 這個順序不只是選單順序：
+#    批次改名(選多個檔案後按 r)抓的是「第一個 block = true 的規則」，
+#    原始碼是 YAZI.opener.block(&r) → .find(|r| r.block)(v26.5.6 逐行對過)。
+#    2026-08-17 曾把 nvim 插在第二順位，結果批次改名靜默改成開 nvim —
+#    Enter 的行為完全沒變，所以不會有人發現，直到真的去批次改名為止。
+edit = [
+	{ run = 'subl %s',          desc = "subl",         for = "windows", orphan = true },
+	{ run = 'subl -w %s',       desc = "subl (block)", for = "windows", block  = true },
+	{ run = 'nvim %s',          desc = "nvim",         for = "windows", block  = true },
+	{ run = '${EDITOR:-vi} %s', desc = "$EDITOR",      for = "unix",    block  = true },
+]
+
+# ---------------------------------------------------------------------
+# 外掛：fetcher 註冊
+# ---------------------------------------------------------------------
+# ★ 各外掛 README 裡的 id 欄位僅 Yazi <= v26.1.22 需要。
+#   本機為 26.5.6，故一律省略 id — 照抄 README 反而會是舊寫法。
+
+# mime-ext：改用副檔名資料庫判定檔案類型，取代讀取檔頭的 magic-byte 嗅探。
+# Windows 沒有 file(1) 指令，這裡是淨效能收益(省掉整輪 I/O)，
+# 在 \\wsl.localhost 這類慢速路徑上差異尤其明顯。
+# 代價：極少數副檔名騙人的檔案會判錯類型。
+[[plugin.prepend_fetchers]]
+url   = "local://*"
+run   = "mime-ext.local"
+prio  = "high"
+group = "mime"
+
+[[plugin.prepend_fetchers]]
+url   = "remote://*"
+run   = "mime-ext.remote"
+prio  = "high"
+group = "mime"
+
+# git：在檔案列表以 linemode 顯示 modified / added / untracked / ignored。
+# 這是非同步 fetcher — 進目錄時檔案列表立刻出現，狀態圖示稍後才浮上來，
+# 不會阻擋導航。巨大 repo 裡最壞情況是「圖示慢半拍」而非「卡住」。
+[[plugin.prepend_fetchers]]
+url   = "*"
+run   = "git"
+group = "git"
+
+[[plugin.prepend_fetchers]]
+url   = "*/"
+run   = "git"
+group = "git"

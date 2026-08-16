@@ -1,0 +1,90 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+# JetBrains-safe adaptation of the downloaded Tokyo Night preset.
+add_newline = false
+command_timeout = 1000
+
+format = """
+$directory\
+[](fg:#769ff0 bg:#394260)\
+$git_branch\
+$git_status\
+[](fg:#394260 bg:#212736)\
+$nodejs\
+$bun\
+$python\
+$rust\
+$golang\
+$java\
+$php\
+[](fg:#212736 bg:#1d2230)\
+$time\
+[](fg:#1d2230)\
+$line_break\
+$character"""
+
+[directory]
+format = "[ $path ](bold fg:#e3e5e5 bg:#769ff0)"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = ""
+
+[git_branch]
+format = "[ git:$branch ](bold fg:#769ff0 bg:#394260)"
+truncation_length = 28
+truncation_symbol = "…"
+
+[git_status]
+format = "[$all_status$ahead_behind ](bold fg:#e0af68 bg:#394260)"
+conflicted = "~${count}"
+ahead = "+${count}"
+behind = "-${count}"
+diverged = "+${ahead_count}/-${behind_count}"
+untracked = "?${count}"
+stashed = "*${count}"
+modified = "!${count}"
+staged = "+${count}"
+renamed = ">${count}"
+deleted = "x${count}"
+
+[nodejs]
+format = "[ node $version ](bold fg:#9ece6a bg:#212736)"
+version_format = "${raw}"
+
+[bun]
+format = "[ bun $version ](bold fg:#c0caf5 bg:#212736)"
+version_format = "${raw}"
+
+[python]
+format = "[ py $version( $virtualenv) ](bold fg:#7dcfff bg:#212736)"
+version_format = "${raw}"
+
+[rust]
+format = "[ rust $version ](bold fg:#ff9e64 bg:#212736)"
+version_format = "${raw}"
+
+[golang]
+format = "[ go $version ](bold fg:#73daca bg:#212736)"
+version_format = "${raw}"
+
+[java]
+format = "[ java $version ](bold fg:#f7768e bg:#212736)"
+version_format = "${raw}"
+
+[php]
+format = "[ php $version ](bold fg:#bb9af7 bg:#212736)"
+version_format = "${raw}"
+
+[time]
+disabled = false
+time_format = "%R"
+format = "[ $time ](fg:#a0a9cb bg:#1d2230)"
+
+[cmd_duration]
+disabled = true
+
+[character]
+success_symbol = "[>](bold #9ece6a)"
+error_symbol = "[>](bold #f7768e)"
+vimcmd_symbol = "[<](bold #9ece6a)"
+

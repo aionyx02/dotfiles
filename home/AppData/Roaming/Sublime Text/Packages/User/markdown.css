@@ -1,0 +1,82 @@
+/*
+ * MarkdownPreview 的使用者 CSS 覆寫。
+ * 檔名必須是 <parser>.css —— 我們的 parser 設為 "markdown"，所以這支叫 markdown.css。
+ * 只有在 MarkdownPreview.sublime-settings 的 allow_css_overrides 為 true 時才會套用。
+ *
+ * 目的：讓中文講義的預覽不要出現豆腐字，且排版接近 HackMD。
+ */
+
+body {
+	font-family:
+		"JetBrains Mono NL",          /* 英數 */
+		"Noto Sans TC",               /* 繁中，你機器上已安裝 */
+		"Microsoft JhengHei",         /* 繁中備援 */
+		sans-serif;
+	font-size: 16px;
+	line-height: 1.8;                 /* 中文長文需要比英文更鬆的行距 */
+	max-width: 860px;                 /* 避免在寬螢幕上一行拉太長，難以回行 */
+	margin: 0 auto;
+	padding: 2.5em 2em 6em;
+	letter-spacing: 0.02em;           /* 中英夾雜時稍微鬆一點比較好讀 */
+}
+
+h1, h2, h3, h4, h5, h6 {
+	line-height: 1.4;
+	margin-top: 1.8em;
+	margin-bottom: 0.6em;
+}
+
+h1, h2 {
+	padding-bottom: 0.3em;
+	border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+/* 程式碼一律用等寬，不要被上面的中文字型接手 */
+code, pre, kbd, samp {
+	font-family: "JetBrains Mono NL", "Cascadia Mono", Consolas, monospace;
+	font-size: 0.9em;
+}
+
+pre {
+	line-height: 1.55;
+	padding: 1em;
+	overflow-x: auto;                 /* 長行橫向捲動，不要撐破版面 */
+	border-radius: 6px;
+}
+
+/* 表格：講義裡很常用，給明確框線 */
+table {
+	border-collapse: collapse;
+	margin: 1.2em 0;
+	width: 100%;
+}
+
+th, td {
+	border: 1px solid rgba(128, 128, 128, 0.35);
+	padding: 0.5em 0.85em;
+	text-align: left;
+}
+
+th {
+	background: rgba(128, 128, 128, 0.12);
+	font-weight: 600;
+}
+
+blockquote {
+	margin: 1.2em 0;
+	padding: 0.2em 1.2em;
+	border-left: 4px solid rgba(122, 162, 247, 0.7);   /* Tokyo Night 的藍 */
+	color: inherit;
+	opacity: 0.9;
+}
+
+/* 任務清單（pymdownx.tasklist）對齊 */
+ul.task-list {
+	list-style: none;
+	padding-left: 1.2em;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}

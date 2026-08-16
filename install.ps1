@@ -102,13 +102,27 @@ $ExtraDeps = @(
         Command = { cargo install --git https://github.com/rtk-ai/rtk }
         Why     = 'claude/settings.json 的 PreToolUse hook 靠它'
     }
+    # 沒有它，收進來的 CLAUDE.md / settings.json / skills 全是死檔。
+    # 刻意放在這裡而不是 winget-core.json：這台機器上的 claude 是原生安裝器裝的
+    # （~/.local/bin/claude.exe，會自我更新），winget 再裝一份會有兩個執行檔搶 PATH。
+    # 靠下面的 Probe 擋住——已經有 claude 就跳過，只有空機器才會真的安裝。
+    [pscustomobject]@{
+        Name    = 'Claude Code'
+        Probe   = 'claude'
+        Command = { winget install --id Anthropic.ClaudeCode --exact --silent `
+                        --accept-package-agreements --accept-source-agreements `
+                        --disable-interactivity }
+        Why     = '~/.config/claude 底下的設定與 41 個 skills 全靠它'
+    }
 )
 
 # ── -Verify 會檢查的核心工具 ─────────────────────────────────────────
 $CoreTools = @(
     'wezterm-gui', 'starship', 'pwsh', 'zoxide', 'yazi', 'fzf',
-    'rg', 'fd', '7z', 'nvim', 'git', 'gh', 'subl', 'ffmpeg',
-    'node', 'cargo', 'ccstatusline', 'rtk'
+    'rg', 'fd', '7z', 'nvim', 'git', 'gh', 'subl',
+    # yazi 內建預覽會呼叫的：影片縮圖 / JSON / PDF / SVG·HEIC·字型 / 全機檔名搜尋
+    'ffmpeg', 'jq', 'pdftoppm', 'magick', 'es',
+    'node', 'cargo', 'ccstatusline', 'rtk', 'claude'
 )
 
 $BackupRoot = Join-Path $UserHome ('.dotfiles-backup\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
@@ -453,6 +467,13 @@ if ($SkipDeps) {
     Write-Head '階段 3 / 3：非-winget 依賴（已跳過）'
 } else {
     Write-Head '階段 3 / 3：非-winget 依賴'
+
+    # 階段 2 剛用 winget 裝的 Node / Rustup 不會出現在「這個 shell」的 PATH 裡——
+    # PATH 是行程啟動時從登錄檔複製過來的，之後的變更只有新行程看得到。
+    # 空機器上若不重讀，下面的 npm 與 cargo 會全部找不到而失敗。
+    $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+    $userPath    = [Environment]::GetEnvironmentVariable('Path', 'User')
+    $env:Path = (@($machinePath, $userPath) | Where-Object { $_ }) -join ';'
 
     foreach ($d in $ExtraDeps) {
         if (Get-Command $d.Probe -ErrorAction SilentlyContinue) {

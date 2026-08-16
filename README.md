@@ -37,7 +37,7 @@ dotfiles/
 ├─ docs/                          ← repo 自己的模組說明（不會被部署出去）
 ├─ skills/dotfiles/               ← 本 repo 的維護規則。專案專用，不進全域 skills
 ├─ bootstrap/
-│  └─ winget-core.json            重灌時要裝的 17 個套件
+│  └─ winget-core.json            重灌時要裝的 22 個套件
 ├─ install.ps1                    部署 / 健檢
 └─ README.md
 ```
@@ -65,8 +65,19 @@ cd D:\Project\dotfiles
 | 階段 | 做什麼 | 失敗的後果 |
 |---|---|---|
 | 1 | 建立 14 條 symlink，既有內容先 **Move**（不是複製、不是刪）到 `~/.dotfiles-backup/<timestamp>/` | 中斷——這是核心 |
-| 2 | `winget` 裝 `bootstrap/winget-core.json` 的 17 個套件 | 該工具不可用，其餘照常 |
-| 3 | `npm i -g ccstatusline`、`cargo install --git .../rtk` | Claude Code 的狀態列與 hook 失效，終端機本身不受影響 |
+| 2 | `winget` 裝 `bootstrap/winget-core.json` 的 22 個套件 | 該工具不可用，其餘照常 |
+| 3 | `npm i -g ccstatusline`、`cargo install --git .../rtk`、Claude Code | 對應功能失效，終端機本身不受影響 |
+
+`winget-core.json` 的判準是「**這份配置跑不跑得起來**」，不是「這台機器裝了什麼」（機器上共 102 個 winget 套件）。容易被漏掉的是 yazi 內建預覽呼叫的那幾支——它們不出現在 `yazi.toml` 裡，因為是預設行為：
+
+| 套件 | 提供 | 少了會怎樣 |
+|---|---|---|
+| `Gyan.FFmpeg` | `ffmpeg` / `ffprobe` | 影片沒有縮圖 |
+| `jqlang.jq` | `jq` | JSON 預覽變純文字 |
+| `oschwartz10612.Poppler` | `pdftoppm` | PDF 無法預覽 |
+| `ImageMagick.ImageMagick` | `magick` | SVG / HEIC / 字型無法預覽 |
+| `voidtools.Everything` + `.Cli` | 服務 + `es.exe` | `everything.yazi`（`` <F4> / `e ``）整個失效 |
+| `7zip.7zip` | `7z` | 壓縮檔無法預覽或解壓 |
 
 腳本**冪等**：重跑時已正確的 link 直接跳過。它刻意維持 PowerShell 5.1 相容，因為重灌後的乾淨 Windows 只有 5.1（pwsh 7 正是它要裝的東西之一）。
 

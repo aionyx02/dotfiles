@@ -15,14 +15,17 @@
 
 ---
 
-## settings.json 的兩個外部依賴
+## 外部依賴
 
-這兩個都**不是 winget 能裝的**，由 `install.ps1` 的階段 3 處理（寬容失敗——它們壞掉只影響 Claude Code 的外觀與 hook，終端機本身不受影響）：
+三個都由 `install.ps1` 的階段 3 處理，寬容失敗——壞掉只影響 Claude Code，終端機本身不受影響：
 
-| 依賴 | 安裝 | settings.json 怎麼用它 |
+| 依賴 | 安裝 | 用途 |
 |---|---|---|
+| Claude Code | `winget install Anthropic.ClaudeCode` | 沒它的話，這個模組收的全是死檔 |
 | `ccstatusline` | `npm i -g ccstatusline`（需 Node.js） | `statusLine.command`，外觀設定在 `~/.config/ccstatusline/settings.json` |
 | `rtk` | `cargo install --git https://github.com/rtk-ai/rtk`（需 rustup） | `PreToolUse` hook `rtk hook claude` |
+
+Claude Code 刻意**不放進 `winget-core.json`**：這台機器上的 `claude` 是原生安裝器裝的（`~/.local/bin/claude.exe`，會自我更新），winget 再裝一份就有兩個執行檔搶 PATH。放在階段 3 靠 probe 擋住，只有「`claude` 不在 PATH」的空機器才會真的安裝。
 
 **`rtk` 有名稱衝突**：crates.io 上另有一個 `rtk`（reachingforthejack／Rust Type Kit）。必須用上面的 git URL 安裝，裝錯的話 `rtk gain` 會找不到指令。
 

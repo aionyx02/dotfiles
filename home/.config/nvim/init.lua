@@ -25,5 +25,7 @@ vim.g.maplocalleader = '\\'
 
 require('options')
 require('autocmds')
-require('plugins') -- 安裝並設定外掛(第一次會 git clone，需要網路)
-require('keymaps') -- 我們自己的 leader 鍵，放最後：此時外掛指令已經存在
+require('completion') -- 打字時自動跳補全選單(純內建，不靠外掛)
+require('lsp')        -- 啟用語言伺服器(設定在 nvim/lsp/ 底下，也不靠外掛)
+require('plugins')    -- 安裝並設定外掛(第一次會 git clone，需要網路)
+require('keymaps')    -- 我們自己的 leader 鍵，放最後：此時外掛指令已經存在

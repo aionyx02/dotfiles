@@ -58,10 +58,33 @@ image_delay   = 100
 #    原始碼是 YAZI.opener.block(&r) → .find(|r| r.block)(v26.5.6 逐行對過)。
 #    2026-08-17 曾把 nvim 插在第二順位，結果批次改名靜默改成開 nvim —
 #    Enter 的行為完全沒變，所以不會有人發現，直到真的去批次改名為止。
+#
+# ★★★ nvim 那條為什麼是 `if defined NVIM`(2026-08-24 修掉的真 bug)：
+#    `open --interactive`(內建的 O、本設定的 `o)在 --chooser-file 模式下
+#    「不會」交回 chooser。原始碼 yazi-actor/src/mgr/open.rs 第一個判斷就是
+#        if !opt.interactive && ARGS.chooser_file.is_some() { …交回 chooser… }
+#    interactive 被那個 ! 擋在門外，於是它真的去跑下面這串 opener 規則。
+#    而從 nvim 用 \y(yazi.nvim)叫出來的 yazi 一定帶 --chooser-file，所以
+#    「按 O 選 nvim」= 在『nvim → yazi 的浮動 terminal』裡再開一個 nvim，
+#    兩個 nvim 開同一個檔就撞 swap(E325)。Enter 完全不受影響 —— 它非
+#    interactive，永遠走 chooser，所以這個洞只有走選單時才會掉進去。
+#
+#    NVIM 是 nvim 注入給 pty job 的變數(值是 server pipe 位址)，standalone
+#    的 yazi 沒有 —— 拿它當判斷可以精準分開「在 nvim 裡」與「不在」。
+#    巢狀時改叫 `ya emit open`：請 yazi 自己再跑一次「非 interactive 的 open」，
+#    這次就吃得到上面那個 chooser 分支了，等同你按 Enter，檔案交回外層 nvim 開。
+#
+#    ★ 不用 `nvim --server %NVIM% --remote`：實測過 --remote 是 edit 進
+#      「當前視窗」，而當時的當前視窗正是還在跑 yazi 的那個浮動窗 —— 檔案會
+#      蓋掉 yazi 的畫面，比原本的 bug 更難收拾。
+#    ★ 邊界：在 nvim 裡自己 :terminal 跑 yazi(沒有 --chooser-file)時按 O 選
+#      nvim，會落到第一條 subl。不會巢狀，但也不是 nvim —— 這是刻意的取捨。
+#    ★ desc 必須明寫 "nvim"：沒寫的話 yazi 取 run 的第一個字，選單會顯示 "if"。
 edit = [
 	{ run = 'subl %s',          desc = "subl",         for = "windows", orphan = true },
 	{ run = 'subl -w %s',       desc = "subl (block)", for = "windows", block  = true },
-	{ run = 'nvim %s',          desc = "nvim",         for = "windows", block  = true },
+	{ run = 'if defined NVIM (ya emit open) else nvim %s',
+	                            desc = "nvim",         for = "windows", block  = true },
 	{ run = '${EDITOR:-vi} %s', desc = "$EDITOR",      for = "unix",    block  = true },
 ]
 

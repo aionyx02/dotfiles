@@ -136,12 +136,16 @@
 
 ## 4. 跟系統剪貼簿之間
 
-vim 的 `y` 進的是 vim 自己的暫存器，**不會**進 Windows 剪貼簿。這是刻意保留的原生行為：
+這份設定讓 **`y` 複製的內容同時寫入 Windows 剪貼簿**（`yy`、`yiw`、選取後按 `y` 都算）。
+只有 `y` 會這樣：`d`、`c`、`x` 刪掉的內容**不會**進剪貼簿。
 否則你隨手按個 `dd` 刪一行，剛剛從瀏覽器複製的東西就沒了。
+（做法見 `lua/autocmds.lua`；它沒有改動任何鍵位，`y` 仍是原生的 `y`。）
 
 | 要做的事 | 打什麼 |
 |---|---|
-| 複製到 Windows 剪貼簿 | `"+y`（先選取，或用 `"+yy` 複製整行） |
+| 複製到 Windows 剪貼簿 | `y`（例如 `yy` 複製整行） |
+| 複製但**不**動剪貼簿 | 指定暫存器，例如 `"ayy`（之後用 `"ap` 貼上） |
+| 把刪掉的內容放進剪貼簿 | `"+d`（例如 `"+dd`） |
 | 從 Windows 剪貼簿貼上 | `"+p`，或直接按 **`Ctrl+V`** |
 
 > **★ `Ctrl+V` 貼上是安全的**
@@ -249,6 +253,54 @@ yazi.nvim 另外在那個視窗裡加了幾個鍵：
 >
 > **★ 預設的 `Ctrl+Y`（複製相對路徑）已經在設定裡關掉**——那個功能需要 `realpath`，
 > Windows 上沒有。留著只會讓 `:checkhealth` 永遠掛一個修不好的警告。
+
+### 自動補全（不需要按任何鍵）
+
+在 Insert 模式打字時，只要連續打了 2 個以上的英數字元，就會自動跳出候選清單。
+清單只是**顯示**，不會自動替你改字：
+
+| 鍵 | 動作 |
+|---|---|
+| `Tab` / `Shift+Tab` | 上下選擇（`Ctrl+N` / `Ctrl+P` 也可以） |
+| `Ctrl+Y` | 確認，插入選中的候選字 |
+| `Ctrl+E` | 取消，回到原本打的字 |
+| 不理它，繼續打字 | 清單會跟著過濾，打完自己消失 |
+
+`Enter` 仍是換行。`Tab` 只在清單開著時用來選擇，清單沒開時仍是縮排。
+
+候選字的來源依檔案而定：
+
+- **有語言伺服器的檔案**（見下一節）：由語言伺服器提供，例如函式名稱、參數、型別。
+- **其他檔案**（設定檔、git commit 訊息、純文字）：從已開啟的檔案中收集單字。
+  你要打的字通常已經在檔案裡出現過，所以拿來避免拼錯字很有用。
+
+### 語言伺服器（LSP）
+
+開啟下列檔案時，會自動啟動對應的語言伺服器，提供補全、錯誤提示與跳轉。
+找不到對應的程式時會直接略過，不會報錯。
+
+| 檔案 | 語言伺服器 | 安裝方式 |
+|---|---|---|
+| `.lua` | lua-language-server | winget（`install.ps1` 會安裝） |
+| `.py` | basedpyright + ruff | `uv tool install`（`install.ps1` 會安裝） |
+| `.c` `.cpp` `.h` | clangd | 需自行安裝 |
+| `.rs` | rust-analyzer | `rustup component add rust-analyzer`；只在 Cargo 專案中啟動 |
+
+錯誤訊息只顯示在**游標所在的那一行**，其他行只在左邊標一個符號。
+以下都是 nvim 內建的鍵，這份設定沒有另外綁：
+
+| 鍵 | 功能 |
+|---|---|
+| `K` | 看說明（函式簽名、型別、文件） |
+| `grn` | 改名（整個專案的參照一起改） |
+| `gra` | 自動修正（code action） |
+| `grr` | 找所有引用 |
+| `gri` | 找實作 |
+| `grt` | 找型別定義 |
+| `gO` | 列出這個檔案的所有函式與變數 |
+| `Ctrl+S`（Insert 模式） | 看參數提示 |
+
+要確認語言伺服器有沒有接上，執行 `:checkhealth vim.lsp`。
 
 ---
 
@@ -417,18 +469,27 @@ vim 的「已開啟檔案」叫 **buffer**，跟「視窗」是兩件事：一�
 
 ```
 ~/.config/nvim/               ← 真身（可以整份丟進 git，全是純文字）
-├── init.lua                  ← 入口，設 leader、載入下面四塊
+├── init.lua                  ← 入口，設 leader、載入下面幾塊
 ├── TUTORIAL.md               ← 這份文件
 ├── nvim-pack-lock.json       ← 每個外掛鎖在哪個 commit（自動生成，別手改）
+├── lsp/                      ← 各語言伺服器的設定，檔名就是 server 名
+│   ├── lua_ls.lua            ← Lua
+│   ├── basedpyright.lua      ← Python：補全與型別檢查
+│   ├── ruff.lua              ← Python：lint 與格式化
+│   ├── clangd.lua            ← C / C++
+│   └── rust_analyzer.lua     ← Rust
 └── lua/
     ├── options.lua           ← 基本選項
-    ├── autocmds.lua          ← .ps1 的 BOM、複製高亮、lua 縮排
+    ├── autocmds.lua          ← .ps1 的 BOM、複製高亮、y 同步剪貼簿、lua 縮排
+    ├── completion.lua        ← 打字時自動跳出補全選單
+    ├── lsp.lua               ← 決定啟用哪些語言伺服器、診斷訊息怎麼顯示
     ├── keymaps.lua           ← 上面那 5 個鍵，全部在這裡
     ├── plugins.lua           ← 載入器：掃描下面的資料夾並安裝
     └── plugins/
         ├── colorscheme.lua   ← tokyonight
         ├── fzf-lua.lua       ← \f \g \b
         ├── gitsigns.lua      ← ]c [c 與左欄標示
+        ├── treesitter.lua    ← 語法上色（parser 清單在這裡）
         └── yazi.lua          ← \y \Y（含它的依賴 plenary）
 
 %LOCALAPPDATA%\nvim           ← 目錄 junction，指向上面那個目錄

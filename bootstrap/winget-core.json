@@ -20,6 +20,8 @@
         { "PackageIdentifier": "voidtools.Everything" },
         { "PackageIdentifier": "voidtools.Everything.Cli" },
         { "PackageIdentifier": "Neovim.Neovim" },
+        { "PackageIdentifier": "tree-sitter.tree-sitter-cli" },
+        { "PackageIdentifier": "LuaLS.lua-language-server" },
         { "PackageIdentifier": "SublimeHQ.SublimeText.4" },
         { "PackageIdentifier": "Git.Git" },
         { "PackageIdentifier": "GitHub.cli" },

@@ -37,7 +37,7 @@ dotfiles/
 ├─ docs/                          ← repo 自己的模組說明（不會被部署出去）
 ├─ skills/dotfiles/               ← 本 repo 的維護規則。專案專用，不進全域 skills
 ├─ bootstrap/
-│  └─ winget-core.json            重灌時要裝的 22 個套件
+│  └─ winget-core.json            重灌時要裝的 24 個套件
 ├─ install.ps1                    部署 / 健檢
 └─ README.md
 ```
@@ -64,9 +64,9 @@ cd D:\Project\dotfiles
 
 | 階段 | 做什麼 | 失敗的後果 |
 |---|---|---|
-| 1 | 建立 14 條 symlink，既有內容先 **Move**（不是複製、不是刪）到 `~/.dotfiles-backup/<timestamp>/` | 中斷——這是核心 |
-| 2 | `winget` 裝 `bootstrap/winget-core.json` 的 22 個套件 | 該工具不可用，其餘照常 |
-| 3 | `npm i -g ccstatusline`、`cargo install --git .../rtk`、Claude Code | 對應功能失效，終端機本身不受影響 |
+| 1 | 建立 13 條 symlink，以及讓 nvim、yazi 的預設設定位置指向 `.config` 的 2 條 junction；既有內容先 **Move**（不是複製、不是刪）到 `~/.dotfiles-backup/<timestamp>/`。另外設定 User 環境變數 `YAZI_CONFIG_HOME` | 中斷——這是核心，有任何一條失敗就不會執行階段 2、3 |
+| 2 | `winget` 裝 `bootstrap/winget-core.json` 的 24 個套件；裝完後把 7-Zip、Sublime Text 補進 User PATH（兩者的安裝程式都不會自己加） | 該工具不可用，其餘照常 |
+| 3 | `npm i -g ccstatusline`、`cargo install --git .../rtk`、Claude Code、uv，以及用 `uv tool install` 裝 nvim 的 Python LSP（basedpyright、ruff） | 對應功能失效，終端機本身不受影響 |
 
 `winget-core.json` 的判準是「**這份配置跑不跑得起來**」，不是「這台機器裝了什麼」（機器上共 102 個 winget 套件）。容易被漏掉的是 yazi 內建預覽呼叫的那幾支——它們不出現在 `yazi.toml` 裡，因為是預設行為：
 
@@ -78,8 +78,11 @@ cd D:\Project\dotfiles
 | `ImageMagick.ImageMagick` | `magick` | SVG / HEIC / 字型無法預覽 |
 | `voidtools.Everything` + `.Cli` | 服務 + `es.exe` | `everything.yazi`（`` <F4> / `e ``）整個失效 |
 | `7zip.7zip` | `7z` | 壓縮檔無法預覽或解壓 |
+| `tree-sitter.tree-sitter-cli` | `tree-sitter` | nvim 無法編譯 treesitter parser，C++ / Python 等只剩基本上色（啟動時會提示一次） |
 
-腳本**冪等**：重跑時已正確的 link 直接跳過。它刻意維持 PowerShell 5.1 相容，因為重灌後的乾淨 Windows 只有 5.1（pwsh 7 正是它要裝的東西之一）。
+編譯 parser 還需要 C 編譯器，但**刻意不列入**：只有首次或新增語言時才用得到，不值得為此在每台機器裝 Visual Studio。tree-sitter CLI 會自動找到已安裝的 Visual Studio（MSVC，不必在 PATH 上）；沒有 VS 的機器設定 `CC=gcc` 改用 mingw 即可。
+
+腳本**冪等**：重跑時已正確的 link、環境變數與 PATH 直接跳過。`-Verify` 除了連結與工具，也會檢查環境變數、PATH，以及含中文的 `.ps1` 有沒有 UTF-8 BOM。它刻意維持 PowerShell 5.1 相容，因為重灌後的乾淨 Windows 只有 5.1（pwsh 7 正是它要裝的東西之一）。
 
 ---
 
@@ -141,7 +144,7 @@ cd D:\Project\dotfiles; .\install.ps1
 | **Starship** | Tokyo Night 提示列，依終端機自動切換兩套配置 | [見 PowerShell](docs/powershell.md#starship兩套配置自動切換) |
 | **PowerShell** | 5.1 與 7 共用的 profile，快取式啟動（不 spawn 外部程序） | [說明](docs/powershell.md) |
 | **Yazi** | 檔案管理器，含 tokyo-night flavor 與 9 個 plugin | [實戰手冊](home/.config/yazi/TUTORIAL.md) |
-| **Neovim** | `vim.pack` 管理，fzf-lua / gitsigns / yazi 整合 | [入門手冊](home/.config/nvim/TUTORIAL.md) |
+| **Neovim** | `vim.pack` 管理，fzf-lua / gitsigns / yazi 整合，treesitter 語法上色 | [入門手冊](home/.config/nvim/TUTORIAL.md) |
 | **Claude Code** | 全域指示、權限規則、狀態列、40+ skills | [說明](docs/claude.md) |
 | **ccstatusline** | Claude Code 的狀態列外觀 | [見 Claude Code](docs/claude.md) |
 | **Sublime Text** | 自製 Tokyo Night 配色（與 wezterm 同步）、C++17 build | [說明](docs/sublime.md) |

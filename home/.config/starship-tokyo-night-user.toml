@@ -11,6 +11,7 @@ $git_status\
 [](fg:#394260 bg:#212736)\
 $nodejs\
 $bun\
+$conda\
 $python\
 $rust\
 $golang\
@@ -21,12 +22,12 @@ $time\
 [ ](fg:#1d2230)\
 $line_break\
 $character"""
-# scan_timeout：偵測「這個目錄該啟用哪些模組」的檔案掃描上限。
-#   官方預設 30ms，原本設 1000 等於在冷檔案快取的大目錄裡最多可以卡滿 1 秒才放棄。
-# command_timeout：呼叫外部指令(git / node --version / rustc -V …)的上限。
-#   這台機器 Defender 即時防護開著，光是 spawn 一個 exe 的底價就 ~37ms，
-#   在大 repo 裡 starship 要連續 spawn 4 次 git，冷快取時實測整個 prompt 要 3.7 秒。
-#   壓到 500ms 的代價：那一次不顯示 git 狀態（而非整個 shell 卡住）。
+# scan_timeout：判斷目錄應啟用哪些模組時，檔案掃描的時間上限。
+#   官方預設為 30ms；若設為 1000，在檔案快取未命中的大型目錄中最多會等待 1 秒。
+# command_timeout：呼叫外部指令（git、node --version、rustc -V 等）的時間上限。
+#   本機啟用 Defender 即時保護，每次啟動 exe 至少約需 37ms；
+#   在大型 repo 中 starship 需連續執行 4 次 git，快取未命中時實測整個 prompt 需 3.7 秒。
+#   設為 500ms 的代價是逾時的那一次不顯示 git 狀態，而不會讓整個 shell 卡住。
 scan_timeout = 100
 command_timeout = 500
 
@@ -50,7 +51,7 @@ truncation_length = 28
 truncation_symbol = "…"
 
 [git_status]
-# 這幾個 repo 都沒有 submodule，直接跳過 submodule 掃描
+# 使用中的 repo 皆沒有 submodule，因此略過 submodule 掃描
 ignore_submodules = true
 style = "bg:#394260"
 format = "[[($all_status$ahead_behind )](fg:#769ff0 bg:#394260)]($style)"
@@ -60,13 +61,23 @@ symbol = ""
 style = "bg:#212736"
 format = "[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)"
 
-# 未安裝(實測 Get-Command 找不到 bun / go / php)，關掉可省下每次進入專案目錄的偵測。
-# format 字串裡的 $bun / $golang / $php 保留即可 —— 停用的模組渲染成空字串，外觀不變。
+# 本機未安裝 bun、go、php，停用這些模組可省去每次進入專案目錄時的偵測。
+# format 字串中的 $bun、$golang、$php 可保留，停用的模組會顯示為空字串，外觀不變。
 [bun]
 disabled = true
 symbol = ""
 style = "bg:#212736"
 format = "[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)"
+
+# starship 會接管整個 prompt，conda hook 原本加在 prompt 前的 (env) 會被蓋掉，
+# 必須靠此模組顯示。ignore_base = false：base 也顯示，才看得出 conda 有沒有啟用。
+# symbol 不可用 starship 預設的 🅒（U+1F152）：WezTerm 的字型後援鏈裡沒有任何字型含此字，
+# 會落到系統後援或顯示成方框，寬度也不固定而把後面的色塊擠歪。改用 Nerd Font 的 dev-anaconda。
+[conda]
+symbol = ""
+ignore_base = false
+style = "bg:#212736"
+format = "[[ $symbol $environment ](fg:#9ece6a bg:#212736)]($style)"
 
 [python]
 symbol = ""

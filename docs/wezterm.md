@@ -14,7 +14,7 @@ Windows 極簡科技冷色配置。單檔 `wezterm.lua`，配色 Tokyo Night，�
 - **聚光燈式分屏** — `inactive_pane_hsb` 把非焦點分屏壓到 brightness 0.42，當前分屏像被打光。
 - **Tmux 式分屏熱鍵** — `Alt+Shift+|` / `-` 分屏，`Alt+HJKL` 秒切，`Alt+Shift+HJKL` 調整大小。
 - **多螢幕 / 高刷新率優化** — `WebGpu` + `LowPower` 綁內顯，解決跨 DPI（150%／125%）、跨刷新率（144Hz／240Hz）的拖曳卡頓。
-- **中文零亂碼** — `default_prog` 啟動時就壓下 `chcp 65001` 與 `[Console]::OutputEncoding`，並用 `set_environment_variables` 補上 `PYTHONIOENCODING` 等；字型後援鎖 Microsoft YaHei。
+- **中文零亂碼** — `default_prog` 啟動時設定 `[Console]::OutputEncoding` 與 `InputEncoding`（效果等同 `chcp 65001`，但少啟動一個行程），並用 `set_environment_variables` 補上 `PYTHONIOENCODING` 等；字型後援鎖 Microsoft YaHei。遇到 Big5／GBK 等非 UTF-8 的程式或檔案，用 PowerShell profile 的 `enc big5 { … }` 臨時切換編碼（終端機無法自動猜編碼）。
 
 ## 需求
 
@@ -35,7 +35,7 @@ Windows 極簡科技冷色配置。單檔 `wezterm.lua`，配色 Tokyo Night，�
 | 配色 | `config.color_schemes` 的自訂表（`config.colors` 會覆寫它，兩邊要同步） |
 | 字型大小 | `config.font_size`（預設 `11.5`） |
 | 非焦點分屏的暗度 | `inactive_pane_hsb.brightness`（越小越暗） |
-| 渲染後端 | `front_end`。WebGpu 下若透明失效或閃退，依檔內註解的階梯退回 `'OpenGL'` |
+| 渲染後端 | `front_end`。WebGpu 下若透明失效或閃退，可先把 `webgpu_power_preference` 改成 `'HighPerformance'`，仍不行再退回 `'OpenGL'`（檔內註解說明了 OpenGL 在混合顯卡上的疊影問題） |
 
 ## 注意
 

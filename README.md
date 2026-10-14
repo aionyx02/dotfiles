@@ -157,7 +157,7 @@ cd D:\Project\dotfiles; .\install.ps1
 | **Starship** | Tokyo Night 提示列，依終端機自動切換兩套配置 | [見 PowerShell](docs/powershell.md#starship兩套配置自動切換) |
 | **PowerShell** | 5.1 與 7 共用的 profile，快取式啟動（不 spawn 外部程序） | [說明](docs/powershell.md) |
 | **Yazi** | 檔案管理器，含 tokyo-night flavor 與 9 個 plugin | [設定說明](docs/yazi.md) · [實戰手冊](home/.config/yazi/TUTORIAL.md) |
-| **Neovim** | `vim.pack` 管理，fzf-lua / gitsigns / yazi 整合，treesitter 語法上色 | [入門手冊](home/.config/nvim/TUTORIAL.md) |
+| **Neovim** | `vim.pack` 管理，fzf-lua / gitsigns / yazi 整合，treesitter 語法上色 | [設定說明](docs/nvim.md) · [入門手冊](home/.config/nvim/TUTORIAL.md) |
 | **Claude Code** | 全域指示、權限規則、狀態列、40+ skills | [說明](docs/claude.md) |
 | **ccstatusline** | Claude Code 的狀態列外觀 | [見 Claude Code](docs/claude.md) |
 | **Sublime Text** | 自製 Tokyo Night 配色（與 wezterm 同步）、C++17 build | [說明](docs/sublime.md) |

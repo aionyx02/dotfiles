@@ -48,8 +48,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 --  此設定不修改任何鍵位，y、yy、Vy 皆為原生行為。
 --    貼上方向不需設定：WezTerm 的 Ctrl+V 與 Shift+Insert 已綁定
 --    PasteFrom Clipboard，在 insert 模式中可直接使用。
---
---  實測在 nvim 內寫入剪貼簿平均耗時 7.9ms（win32yank.exe），不會造成可察覺的延遲。
 -- ---------------------------------------------------------------------
 vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('yank-to-clipboard', { clear = true }),
@@ -87,7 +85,7 @@ vim.api.nvim_create_autocmd('FileType', {
 --    因此先檢查 buffer 區域的 makeprg 是否為空，空的才填入預設值。
 --
 --  -lstdc++exp：mingw g++ 15 的 std::print 實作位於此函式庫，少了它會連結失敗，
---    且錯誤訊息看不出原因；未使用 <print> 的程式加上也沒有影響（已實測）。
+--    且錯誤訊息看不出原因；未使用 <print> 的程式加上也沒有影響。
 --  -std=c++23：g++ 預設為 C++17，需明確指定。
 --  %:S：路徑含空白時加上引號。mingw 在 -o 沒有副檔名時會自動產生 .exe。
 -- ---------------------------------------------------------------------

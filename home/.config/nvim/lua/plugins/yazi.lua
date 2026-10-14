@@ -13,26 +13,16 @@
 --    其他功能不受影響。
 --
 --  open_for_directories = true：`nvim <目錄>`、`nvim .`、`:e <目錄>` 一律改開 yazi。
---    這是「原生優先」原則的刻意例外（2026-10-14 使用者明確要求），
---    代價是 netrw 整個停用，:Explore 等指令不再存在。
---    vim.g.loaded_netrwPlugin 是 README 建議的寫法：讓 netrw 完全不載入，
---    而不是載入後再被攔截（見 yazi.nvim issue #802）。
---    此 config 在 init.lua 執行期間就會跑，早於 runtime 的 plugin/ 載入，因此能及時生效。
+--    這是「原生優先」原則的刻意例外，代價是 netrw 整個停用（:Explore 不再存在）。
+--    loaded_netrwPlugin 讓 netrw 完全不載入（README 建議的寫法）；
+--    此 config 在 init.lua 期間執行，早於 runtime 的 plugin/ 載入，因此來得及。
 --
---  圖片預覽：nvim 內建終端機不支援任何圖形協定，只能讓 yazi 改用 chafa
---    以字元近似顯示（winget 安裝的 hpjansson.Chafa，需 >= 1.16）。
---    要看原始畫質，請直接在 WezTerm 中執行 yazi。
---
---    但僅安裝 chafa 不會生效：nvim 的 job 會繼承 WezTerm 設定的
---    TERM_PROGRAM、WEZTERM_* 等環境變數，yazi 依此判定自己在 WezTerm 中
---    （yazi --debug 顯示 Brand.from_env = WezTerm、Adapter = Iip），
---    送出的圖片資料被 nvim 終端機直接丟棄，預覽欄一片空白。
---    只清除 TERM_PROGRAM 仍不夠，WEZTERM_* 也會被判定；全部清除後 Adapter 才會變為 Chafa
---    （2026-10-14 以 headless nvim 的 term job 實測）。
---
---    yazi.nvim 沒有提供設定 yazi 環境變數的選項，因此包裝 require('yazi').yazi：
---    \y、\Y、:Yazi toggle、開啟目錄最後都會呼叫它，且 jobstart 在其中同步執行，
---    只需在呼叫期間暫時移除這些變數，結束後立即還原，nvim 其他 job 不受影響。
+--  圖片預覽：nvim 終端機不支援圖形協定，只能讓 yazi 改用 chafa 以字元近似顯示
+--    （需 winget 安裝 hpjansson.Chafa）。要看原始畫質請直接在 WezTerm 中執行 yazi。
+--    但 yazi 會從繼承的 TERM_PROGRAM、WEZTERM_* 誤判自己在 WezTerm 中，
+--    送出的圖片被 nvim 終端機丟棄。因此下方包裝 require('yazi').yazi，
+--    在啟動 yazi 期間暫時移除這些變數。調查過程見 docs/nvim.md；
+--    check.ps1 會實測這個包裝在外掛更新後是否仍有效。
 -- =====================================================================
 
 return {

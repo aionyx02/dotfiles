@@ -1,11 +1,9 @@
 -- =====================================================================
 --  nvim-treesitter：讓 C++ / Python 等語言的語法上色完整
 --
---  沒有 treesitter 時，nvim 使用舊式的 regex 語法檔上色，只認得關鍵字、字串、數字。
---    型別名、函式名、成員、模組名都會與一般文字同色。
---    2026-10-12 實測：C++ 有 22/42 個詞、Python 有 17/43 個詞沒有顏色；
---    LSP 的 semantic tokens 雖可補上一部分，但需等 server 啟動並完成索引（數秒）。
---    treesitter 在開檔當下即完成上色，不需等待。
+--  沒有 treesitter 時，nvim 使用舊式的 regex 語法檔上色，只認得關鍵字、字串、數字，
+--    型別名、函式名、成員、模組名都會與一般文字同色（實測數據見 docs/nvim.md）。
+--    LSP 的 semantic tokens 要等 server 索引完才有；treesitter 在開檔當下即完成上色。
 --
 --  nvim 0.12 只內建 c、lua、markdown、markdown_inline、query、vim、vimdoc 的 parser；
 --    其他語言的 parser 由本套件下載原始碼後編譯。
@@ -15,10 +13,8 @@
 --
 --  外部需求（只有編譯 parser 時才需要，編好之後兩者都可移除）：
 --    tree-sitter CLI   winget install tree-sitter.tree-sitter-cli
---    C 編譯器           不需設定。tree-sitter CLI 會透過 vswhere 自動找到 Visual Studio 的 MSVC
---                       （本機為 VS 2022 Community，即使不在 PATH 上也找得到）。
---                       沒有 Visual Studio 的機器可改用 mingw gcc：先設定環境變數 CC=gcc 再 :TSInstall。
---                       2026-10-12 實測兩者編出的 parser 都能正常載入。
+--    C 編譯器           不需設定，tree-sitter CLI 會自動找到 Visual Studio 的 MSVC。
+--                       沒有 Visual Studio 時：先設定 CC=gcc 再 :TSInstall，改用 mingw。
 --
 --  parser 編譯後放在 %LOCALAPPDATA%\nvim-data\site\parser\，屬於拋棄式快取。
 --  新增語言：把名稱加入下方 parsers 清單即可，下次啟動時會在背景編譯。
@@ -41,7 +37,7 @@ return {
     -- 先自行比對缺少哪些 parser，全部已安裝時（平常的狀態）完全不呼叫 install()。
     --   沒有 tree-sitter CLI 的新機器若直接呼叫，每次啟動都會下載原始碼後編譯失敗，
     --   每個 parser 各跳一條錯誤；改成只提示一次缺少什麼。
-    --   executable() 在本機需要 3～5ms（見 lua/lsp.lua），因此只在確實缺少時才檢查。
+    --   executable() 在本機很慢（見 lua/lsp.lua），因此只在確實缺少時才檢查。
     local ts = require('nvim-treesitter')
     -- 必須傳 'parsers'：不帶參數時 query 與 parser 取聯集，parser 遺失但 query 還在時會誤判為已安裝。
     local installed = ts.get_installed('parsers')

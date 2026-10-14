@@ -80,6 +80,16 @@ interactive 模式不符合此條件，因此會實際執行 opener 規則。Ent
 
 取代讀取檔頭的 magic-byte 判斷。Windows 沒有 `file(1)`，改用副檔名資料庫可省去一輪 I/O，在 `\\wsl.localhost` 等較慢的路徑上差異尤其明顯。代價是副檔名與實際內容不符的少數檔案會被誤判。資料庫缺少的副檔名（heic、heif、hif）在 `init.lua` 補上。
 
+### HEIF 副檔名（`init.lua` 的 `with_exts`）
+
+mime-ext 的資料庫只收錄了 avif，沒有 heic、heif、hif（hif 是 Canon、Fujifilm 相機產生的同一格式）。查不到時並非判斷錯誤，而是完全沒有類型：`local.lua` 直接回傳 `application/octet-stream`（`local.lua:1113`），previewer 因而落到最後一條 `{ url = "*", run = "file" }`，畫面只顯示檔案資訊而沒有圖片。
+
+補上後不需安裝其他外掛。yazi 內建的 preset 已有 `{ mime = "image/{avif,hei?,jxl}", run = "magick" }`（previewers 與 preloaders 各一條），`hei?` 的 `?` 比對一個字元。該規則呼叫 ImageMagick 7 的 `magick.exe`，本機 7.1.2-29 的 delegates 含 heic（libheif 1.23.1），可以正常讀取。
+
+- `hei?` 比對的是右側的 **value** 而不是左側的 key，所以 value 必須寫成 `image/heic` 或 `image/heif`，不可寫成 `image/x-heic`。`hif` 這個 key 不符合 `hei?` 沒有影響，因為它的 value 是 `image/heif`。
+- 不需處理大小寫：查表前會先 `:lower()`（`local.lua:1105`），`.HEIC` 同樣能比對。
+- `remote://` 不需另外設定：`mime-ext.remote` 查不到時會改呼叫 `.local`。
+
 ### git：在檔案列表顯示狀態
 
 以 linemode 顯示 modified、added、untracked、ignored。此 fetcher 是非同步的：進入目錄時檔案列表立即顯示，狀態圖示稍後才出現。在大型 repo 中最多只是圖示延遲，不會卡住瀏覽。

@@ -3,8 +3,7 @@
 --
 --  不使用 nvim-lspconfig。nvim 0.11 起，讀取 lsp/<名稱>.lua、依 filetype 啟動、
 --    依 root_markers 尋找專案根目錄等功能皆已內建，該套件僅剩提供預設值的作用。
---    本設定只用少數幾個 server，自行撰寫比多一個相依套件更划算，
---    套件數為 6 個（tokyonight、fzf-lua、gitsigns、yazi.nvim、plenary、nvim-treesitter）。
+--    本設定只用少數幾個 server，自行撰寫比多一個相依套件（上限 6 個）更划算。
 --
 --  補全功能位於 lua/completion.lua，該檔同時處理有 LSP 與無 LSP 的情況；
 --    本檔只負責啟動 server。
@@ -24,20 +23,14 @@ local servers = {
 -- ---------------------------------------------------------------------
 --  延遲到首次開啟對應檔案類型時才檢查執行檔
 --
---  `vim.fn.executable()` 在本機每次約需 3～5ms（PATH 有 49 個目錄，且 nvim 不快取結果，
---    連續查詢 100 次需 290ms）。啟動時檢查全部五個 server 約需 19ms，
---    佔 nvim 啟動時間（109ms）的兩成；而開啟 git commit 訊息或 .txt 時，
---    這些查詢完全用不到。
+--  `vim.fn.executable()` 在本機很慢（PATH 很長，且 nvim 不快取結果），
+--    啟動時檢查全部 server 會佔掉約兩成的啟動時間，
+--    而開啟 git commit 訊息或 .txt 時這些查詢完全用不到。
+--    因此改為每種語言第一次開檔時才檢查（once = true）。
 --
---  改為首次開啟該檔案類型時才檢查，只有實際使用該語言時才需付出約 3ms，
---    且每個 session 只檢查一次（once = true）。
---
---  此做法不會遺漏已開啟的 buffer：vim.lsp.enable() 內部會以 doautoall 重新觸發 FileType
---    （見 runtime/lua/vim/lsp.lua 的「Ensure any pre-existing buffers start」），
---    不需要自行補觸發。
---
+--  不會遺漏已開啟的 buffer：vim.lsp.enable() 會自動補接，不需要自行補觸發。
 --  filetypes 直接從 lsp/<名稱>.lua 讀取，不在此重複定義，避免兩份清單不一致。
---    實測解析五個設定檔僅需 1.3ms。
+--  實測數據與原始碼依據：docs/nvim.md。
 -- ---------------------------------------------------------------------
 local group = vim.api.nvim_create_augroup('lsp-lazy-enable', { clear = true })
 

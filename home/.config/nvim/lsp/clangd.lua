@@ -58,6 +58,10 @@ return {
     '--function-arg-placeholders=0',
 
     '--query-driver=' .. table.concat(drivers, ','),
+
+    -- 只輸出錯誤。clangd 預設把一般資訊（版本、每個請求）寫到 stderr，
+    --   nvim 會把 stderr 一律記成 ERROR，lsp.log 因此塞滿假錯誤，真正的錯誤反而找不到。
+    '--log=error',
   },
 
   filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },

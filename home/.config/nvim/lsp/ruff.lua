@@ -14,4 +14,8 @@ return {
   cmd = { 'ruff', 'server' },
   filetypes = { 'python' },
   root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', 'uv.lock', '.git' },
+
+  -- 只輸出錯誤（預設為 info）。理由同 clangd 的 --log=error：
+  --   nvim 會把 server 的 stderr 一律記成 ERROR，lsp.log 會塞滿假錯誤。
+  init_options = { settings = { logLevel = 'error' } },
 }

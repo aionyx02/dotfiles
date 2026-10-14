@@ -453,6 +453,20 @@ vim 的「已開啟檔案」叫 **buffer**，跟「視窗」是兩件事：一�
 
 編譯過了之後——**執行與看輸出開 WezTerm 分屏**，不要在 nvim 裡做。
 
+### C / C++ 已經預先設好
+
+開 `.c` / `.cpp` 時，這份設定會自動做好上面的前兩步（見 `lua/autocmds.lua`），所以直接 `:make` 就好：
+
+| 檔案 | `:make` 執行的指令 |
+|---|---|
+| `.cpp` | `g++ -std=c++23 -Wall -g % -o %:r -lstdc++exp` |
+| `.c` | `gcc -std=c17 -Wall -g % -o %:r` |
+
+編好之後在 WezTerm 分屏執行 `.\檔名.exe`。
+
+想換指令時照樣 `:setlocal makeprg=...`，例如有 Makefile 的專案改回 `:setlocal makeprg=make`。
+手動設過的值不會被蓋掉，`:e` 重新載入也一樣；只影響當前這個檔案。
+
 ### 五個會卡住的地方
 
 1. **`:make` 說找不到 make**：`'makeprg'` 還是預設的 `make`，而當前目錄沒有 Makefile。設 `makeprg` 或先 `:compiler`

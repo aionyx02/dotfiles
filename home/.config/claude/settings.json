@@ -1,38 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "theme": "dark",
-  "tui": "fullscreen",
-  "model": "opus",
-  "effortLevel": "xhigh",
-  "autoUpdatesChannel": "latest",
-  "includeCoAuthoredBy": false,
   "cleanupPeriodDays": 60,
-  "preferredNotifChannel": "terminal_bell",
   "env": {
     "EDITOR": "subl -w"
   },
-  "statusLine": {
-    "type": "command",
-    "command": "\"C:/Program Files/nodejs/node.exe\" \"C:/Users/shawn/AppData/Roaming/npm/node_modules/ccstatusline/dist/ccstatusline.js\"",
-    "padding": 0,
-    "refreshInterval": 10
-  },
-  "enabledPlugins": {
-    "rust-analyzer-lsp@claude-plugins-official": true
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "rtk hook claude"
-          }
-        ]
-      }
-    ]
-  },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "PowerShell(Get-Command *)",
@@ -41,11 +13,6 @@
       "PowerShell(zoxide *)",
       "Bash(rtk ls *)",
       "Bash(rtk read *)"
-    ],
-    "ask": [
-      "Bash(git push:*)",
-      "Bash(rtk git push:*)",
-      "PowerShell(git push:*)"
     ],
     "deny": [
       "Bash(git push --force:*)",
@@ -79,6 +46,48 @@
       "Bash(rm -rf:*)",
       "Bash(rm -fr:*)",
       "PowerShell(Remove-Item * -Recurse *)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(rtk git push:*)",
+      "PowerShell(git push:*)"
     ]
-  }
+  },
+  "model": "opus",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "\"C:/Program Files/nodejs/node.exe\" \"C:/Users/shawn/AppData/Roaming/npm/node_modules/ccstatusline/dist/ccstatusline.js\"",
+    "padding": 0,
+    "refreshInterval": 10
+  },
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true,
+    "clangd-lsp@claude-plugins-official": true
+  },
+  "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "autoCompactWindow": 700000
+    }
+  },
+  "autoUpdatesChannel": "latest",
+  "tui": "fullscreen",
+  "theme": "dark",
+  "preferredNotifChannel": "terminal_bell",
+  "agentPushNotifEnabled": true,
+  "switchModelsOnFlag": true
 }

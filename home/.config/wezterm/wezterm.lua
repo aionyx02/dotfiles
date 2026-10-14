@@ -1,60 +1,65 @@
 -- =====================================================================
---  WezTerm 單檔終極配置  ·  Windows 極簡科技冷色魔改版
---  特色：Mica 深色墨鏡毛玻璃 / 解決中文亂碼 / 圓角膠囊懸浮分頁 / Tmux 分屏
+--  WezTerm 設定（Windows）
+--  內容：半透明背景、Tokyo Night 配色、UTF-8 編碼、圓角分頁列、
+--        類 tmux 的分割窗格鍵位
 -- =====================================================================
 
 local wezterm = require 'wezterm'
 local act = wezterm.action
 local config = wezterm.config_builder()
 
--- Tokyo Night (Night variant)
+-- Tokyo Night（Night 變體）色票，供配色表、分頁列與狀態列引用
 local M = {
   base = '#1a1b26', mantle = '#16161e', crust = '#101014',
   text = '#c0caf5', subtext0 = '#a9b1d6', overlay0 = '#565f89',
-  surface0 = '#24283b', surface1 = '#414868',
-  blue = '#7aa2f7',
+  surface0 = '#24283b', surface1 = '#414868', selection = '#33467c',
+  blue = '#7aa2f7', magenta = '#bb9af7',
   sapphire = '#7dcfff', teal = '#73daca', green = '#9ece6a',
   peach = '#ff9e64', yellow = '#e0af68', red = '#f7768e',
 }
 
---------------------------------------------------------------------
--- 1. 頂級毛玻璃通透 (Glass & Background)
---------------------------------------------------------------------
--- Windows Acrylic 在失焦時可能被 DWM 換成近似實色；使用純 alpha 透明避開該行為。
--- 這會直接顯示後方視窗而不模糊，但聚焦與失焦的透明度保持一致。
-config.win32_system_backdrop = 'Disable'
-config.window_background_opacity = 0.90  -- 保留玻璃感，同時維持 Tokyo Night 對比
-config.text_background_opacity = 1.0     -- Powerline 色塊保持實色，避免視覺重疊
+-- 視窗背景透明度；Ctrl+Shift+B 在此值與 1.0 之間切換
+local OPACITY = 0.90
 
 --------------------------------------------------------------------
--- 2. 配色美學 (已合併 table，徹底解決覆寫導致不透明的問題！)
+-- 1. 視窗透明度
 --------------------------------------------------------------------
+-- 不使用 Windows Acrylic：失焦時 DWM 可能將其換成近似實色。
+-- 改用純 alpha 透明，後方視窗不模糊，但聚焦與失焦的透明度一致。
+config.win32_system_backdrop = 'Disable'
+config.window_background_opacity = OPACITY  -- 保留透明感，同時維持 Tokyo Night 的對比
+config.text_background_opacity = 1.0        -- Powerline 色塊保持不透明，避免與背景重疊
+
+--------------------------------------------------------------------
+-- 2. 配色
+--------------------------------------------------------------------
+-- 注意：配色須集中在同一個 table 內定義；分開覆寫會導致背景變為不透明。
+-- ANSI 的綠色一格使用 M.teal 而非 M.green。
 config.color_schemes = {
   ['Tokyo Night'] = {
-    foreground = '#a9b1d6',
-    background = '#1a1b26',
-    cursor_bg = '#c0caf5',
-    cursor_fg = '#1a1b26',
-    cursor_border = '#c0caf5',
-    selection_bg = '#33467c',
-    selection_fg = '#c0caf5',
+    foreground = M.subtext0,
+    background = M.base,
+    cursor_bg = M.text,
+    cursor_fg = M.base,
+    cursor_border = M.text,
+    selection_bg = M.selection,
+    selection_fg = M.text,
     ansi = {
-      '#414868', '#f7768e', '#73daca', '#e0af68',
-      '#7aa2f7', '#bb9af7', '#7dcfff', '#c0caf5',
+      M.surface1, M.red, M.teal, M.yellow,
+      M.blue, M.magenta, M.sapphire, M.text,
     },
     brights = {
-      '#565f89', '#f7768e', '#73daca', '#e0af68',
-      '#7aa2f7', '#bb9af7', '#7dcfff', '#a9b1d6',
+      M.overlay0, M.red, M.teal, M.yellow,
+      M.blue, M.magenta, M.sapphire, M.subtext0,
     },
   },
 }
 config.color_scheme = 'Tokyo Night'
 
--- ★ 頂條襯底:整條 bar 唯一的可讀性來源。
---   原本設 rgba(0,0,0,0) = 完全零填色,是整個視窗最透的一塊(其他地方至少還有
---   window_background_opacity 0.90 的底),導致狀態列細字直接飄在桌面上、背後一亮就消失。
---   給它一層比視窗本體更實的深色,讀起來像刻意的標題列而非破洞。
---   ↓ 只要調這個 alpha 就能在「通透」與「清楚」之間找平衡 (0.70 較通透 / 0.95 近實色)
+-- 分頁列背景色。
+-- 若設為完全透明，分頁列會比視窗本體（0.90）更透，
+-- 狀態列文字在明亮的桌面背景上將難以辨識，因此使用較不透明的深色。
+-- 調整 alpha 即可在透明感與可讀性之間取捨（0.70 較透明，0.95 接近不透明）。
 local BAR_BG = 'rgba(16, 17, 22, 0.85)'
 
 config.colors = {
@@ -64,40 +69,41 @@ config.colors = {
 }
 
 --------------------------------------------------------------------
--- 3. 告別傳統邊框 + 呼吸感留白
+-- 3. 視窗外框與內距
 --------------------------------------------------------------------
 config.window_decorations = 'INTEGRATED_BUTTONS|RESIZE'
 config.integrated_title_button_style = 'Windows'
 config.integrated_title_buttons = { 'Hide', 'Maximize', 'Close' }
 config.window_padding = { left = 16, right = 16, top = 14, bottom = 12 }
-config.inactive_pane_hsb = { saturation = 0.65, brightness = 0.42 }  -- ★#1 非焦點分屏壓更暗,當前分屏像聚光燈(數字越小越暗)
+config.inactive_pane_hsb = { saturation = 0.65, brightness = 0.42 }  -- 調暗非作用中的窗格以突顯目前窗格（數值越小越暗）
 
 --------------------------------------------------------------------
--- 4. 字型與排版 (已修復找不到字體報錯 & 中文退化問題)
+-- 4. 字型與排版
 --------------------------------------------------------------------
--- 以 WezTerm 內建 JetBrains Mono 打頭陣保證不報錯；微軟雅黑緊跟其後鎖住中文編碼
+-- 首選 WezTerm 內建的 JetBrains Mono，確保字型一定存在；
+-- 中文由 Microsoft YaHei 遞補，避免顯示為方框或字距錯亂。
 config.font = wezterm.font_with_fallback {
-  -- ★文字1+4:字重加粗到 Medium(透明背景上更紮實不發虛)+ 開啟斜線零 'zero'(0 與 O 一眼分辨)
+  -- 字重 Medium：在透明背景上較清晰；'zero'：斜線 0，便於區分 0 與 O
   { family = 'JetBrains Mono', weight = 'Medium', harfbuzz_features = { 'calt=1', 'clig=1', 'liga=1', 'zero' } },
   { family = 'JetBrainsMono NF', weight = 'Medium', harfbuzz_features = { 'calt=1', 'clig=1', 'liga=1', 'zero' } },
-  'Microsoft YaHei',            -- 中文第一順位後援，徹底解決方形框與字距錯誤
+  'Microsoft YaHei',            -- 中文遞補字型
   'Symbols Nerd Font Mono',
   'Segoe UI Emoji',
 }
 config.font_size = 11.5
--- ★ 不要設 config.dpi！(曾設為 120.0，是破圖/疊影/背景穿透的元凶)
---   硬鎖 DPI 會廢掉 WezTerm 的 per-monitor DPI 感知：視窗放大或跨螢幕時，
---   實體像素尺寸與算繪視埠對不上，swapchain 會有一塊區域從未被繪製。
---   在透明視窗上，那塊區域不是黑色，而是被 DWM 合成成後方的視窗內容。
---   代價：跨不同縮放的螢幕時會重建 glyph atlas，拖曳瞬間可能微頓 —— 這是正確行為。
-config.line_height = 1.15       -- 寬鬆行高，增加排版呼吸感
--- ★文字2:前景文字亮度微提,讓字在通透背景上更「浮出」、不被後方桌面吃掉(1.0=原始)
---   注意:數值拉太高(如 1.08)會把抗鋸齒的灰階漸層一起推到頂而「削平」,
---   字緣的過渡階數變少 → 看起來反而像鋸齒/低解析。1.02 是有提亮又不削 AA 的平衡點。
+-- 注意：不要設定 config.dpi。
+--   固定 DPI 會停用 WezTerm 的 per-monitor DPI 感知，視窗縮放或跨螢幕時
+--   實體像素與算繪視埠不一致，swapchain 會留下未繪製的區域；
+--   在透明視窗上，該區域會顯示後方視窗內容，造成破圖與疊影。
+--   跨不同縮放比例的螢幕時會重建 glyph atlas，拖曳時短暫停頓屬正常現象。
+config.line_height = 1.15       -- 略為加大行高
+-- 略為提高前景文字亮度，使文字在透明背景上更清楚（1.0 為原始亮度）。
+--   數值過高（如 1.08）會壓縮抗鋸齒的灰階層次，字緣反而出現鋸齒；
+--   1.02 可提亮且不影響抗鋸齒。
 config.foreground_text_hsb = { hue = 1.0, saturation = 1.0, brightness = 1.02 }
 
 --------------------------------------------------------------------
--- 5. 游標：平滑閃爍
+-- 5. 游標
 --------------------------------------------------------------------
 config.default_cursor_style = 'BlinkingBar'
 config.cursor_blink_rate = 500
@@ -105,30 +111,39 @@ config.cursor_blink_ease_in = 'EaseInOut'
 config.cursor_blink_ease_out = 'EaseInOut'
 
 --------------------------------------------------------------------
--- 6. 靈魂細節 A：圓角膠囊分頁 (懸浮極簡科技風)
+-- 6. 分頁列：圓角分頁
 --------------------------------------------------------------------
 config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = false
--- ★ 頂條常駐:因為 window_decorations 用 INTEGRATED_BUTTONS(視窗按鈕在頂條裡),
---   若單分頁把頂條藏了,按鈕與拖曳把手會一起消失 → 不能移動/關閉(先前那個 bug)。
---   故設 false 讓薄頂條常駐(背景已透明,幾乎不占玻璃),保留拖曳與視窗按鈕。
+-- 注意：分頁列必須常駐。
+--   window_decorations 使用 INTEGRATED_BUTTONS，視窗按鈕與拖曳區都在分頁列上；
+--   只有一個分頁時若隱藏分頁列，視窗將無法移動或關閉。
 config.hide_tab_bar_if_only_one_tab = false
 config.show_new_tab_button_in_tab_bar = false
 config.tab_max_width = 26
 
+-- 取得行程名稱：去除路徑與 .exe 並轉為小寫。
+-- Windows 回傳的名稱帶有 .exe（如 nvim.exe），須先去除才能對應下方的表。
+local function process_name(path)
+  return ((path or ''):gsub('.*[/\\]', ''):lower():gsub('%.exe$', ''))
+end
+
+-- 這些行程代表 WSL 分頁，分頁標題與狀態列一律顯示為 Ubuntu
+local WSL_PROCS = { wsl = true, wslhost = true, ubuntu = true }
+
+-- 行程名稱（不含 .exe）對應的分頁圖示
 local process_icons = {
-  ['powershell.exe'] = wezterm.nerdfonts.md_powershell,
-  ['pwsh.exe']       = wezterm.nerdfonts.md_powershell,
-  ['cmd.exe']        = wezterm.nerdfonts.md_console,
-  ['wsl.exe']        = wezterm.nerdfonts.cod_terminal_bash,
-  ['wslhost.exe']    = '',
-  ['ubuntu.exe']     = '',
+  ['powershell']     = wezterm.nerdfonts.md_powershell,
+  ['pwsh']           = wezterm.nerdfonts.md_powershell,
+  ['cmd']            = wezterm.nerdfonts.md_console,
+  ['wsl']            = wezterm.nerdfonts.cod_terminal_bash,
+  ['wslhost']        = '',
+  ['ubuntu']         = '',
   ['bash']           = wezterm.nerdfonts.cod_terminal_bash,
   ['nvim']           = wezterm.nerdfonts.custom_vim,
   ['vim']            = wezterm.nerdfonts.custom_vim,
   ['node']           = wezterm.nerdfonts.md_nodejs,
   ['python']         = wezterm.nerdfonts.md_language_python,
-  ['python.exe']     = wezterm.nerdfonts.md_language_python,
   ['cargo']          = wezterm.nerdfonts.dev_rust,
   ['lua']            = wezterm.nerdfonts.md_language_lua,
   ['docker']         = wezterm.nerdfonts.md_docker,
@@ -140,21 +155,21 @@ local LEFT_EDGE = wezterm.nerdfonts.ple_left_half_circle_thick
 local RIGHT_EDGE = wezterm.nerdfonts.ple_right_half_circle_thick
 
 wezterm.on('format-tab-title', function(tab, tabs, panes, cfg, hover, max_width)
-  -- ★#4 rim = 膠囊兩端半圓的顏色;激活時用比膠囊更亮的冰藍做「鑲邊發光」
-  local bg, fg, rim = M.surface0, M.subtext0, M.surface0   -- 未激活：暗灰低調
+  -- rim：分頁兩端半圓的顏色；作用中的分頁使用較亮的藍色作為外緣
+  local bg, fg, rim = M.surface0, M.subtext0, M.surface0   -- 非作用中：暗灰
   if tab.is_active then
-    bg, fg, rim = M.blue, M.crust, '#a6e3ff'               -- 激活：冰藍膠囊 + 更亮鑲邊發光 + 粗體
+    bg, fg, rim = M.blue, M.crust, '#a6e3ff'               -- 作用中：藍底、亮藍外緣、粗體
   elseif hover then
     bg, fg, rim = M.surface1, M.text, M.surface1
   end
-  local proc = (tab.active_pane.foreground_process_name or ''):gsub('.*[/\\]', ''):lower()
+  local proc = process_name(tab.active_pane.foreground_process_name)
   local icon = process_icons[proc] or wezterm.nerdfonts.md_console_line
   local title = (tab.active_pane.title or ''):gsub('%.exe$', '')
-  if proc == 'wslhost.exe' or proc == 'wsl.exe' or proc == 'ubuntu.exe' then
+  if WSL_PROCS[proc] then
     icon = ''
     title = 'Ubuntu'
   end
-  -- 依顯示寬度截斷，不會像 string.sub 一樣切壞中文 UTF-8。
+  -- 依顯示寬度截斷；string.sub 以位元組計算，會切壞中文的 UTF-8 編碼。
   title = wezterm.truncate_right(title, 16)
   return {
     { Background = { Color = BAR_BG } }, { Foreground = { Color = rim } }, { Text = LEFT_EDGE },
@@ -168,13 +183,13 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, cfg, hover, max_width)
 end)
 
 --------------------------------------------------------------------
--- 6b. 靈魂細節 B：現代化狀態列 (冷色調系統資訊)
+-- 6b. 狀態列：系統、工作區、目前目錄、時間、電量
 --------------------------------------------------------------------
 wezterm.on('update-status', function(window, pane)
-  local status_proc = (pane:get_foreground_process_name() or ''):gsub('.*[/\\]', ''):lower()
+  local status_proc = process_name(pane:get_foreground_process_name())
   local system_icon = wezterm.nerdfonts.md_microsoft_windows
   local system_name = 'Windows'
-  if status_proc == 'wslhost.exe' or status_proc == 'wsl.exe' or status_proc == 'ubuntu.exe' then
+  if WSL_PROCS[status_proc] then
     system_icon = ''
     system_name = 'Ubuntu'
   end
@@ -210,56 +225,52 @@ wezterm.on('update-status', function(window, pane)
   window:set_right_status(wezterm.format(cells))
 end)
 
--- 不註冊 window-focus-changed：聚焦與失焦都使用同一個 0.72 透明度。
+-- 不註冊 window-focus-changed：聚焦與失焦使用相同的透明度。
 
 --------------------------------------------------------------------
--- 7. HiDPI / 高刷新率 / 渲染強化 (已移除廢棄指令)
+-- 7. 算繪與效能
 --------------------------------------------------------------------
--- ★ 本機是混合顯卡 (NVIDIA RTX 4060 Laptop + Intel UHD)，且螢幕由 Intel 驅動。
---   舊設定 front_end='OpenGL' + prefer_egl=true 會走 ANGLE/D3D11：
---   混合顯卡上 resize 重建 swapchain 容易殘留舊 buffer → 疊影/破圖。
---   改用 WebGpu(此版本的預設後端)，並用 LowPower 明確挑 Intel 內顯 ——
---   讓算繪與畫面輸出在同一張卡上，避免跨 adapter 呈現造成 alpha 失效。
+-- 本機為混合顯卡（NVIDIA RTX 4060 Laptop + Intel UHD），螢幕由 Intel 內顯輸出。
+--   OpenGL 前端（搭配 prefer_egl）經由 ANGLE/D3D11，在混合顯卡上調整視窗大小時
+--   容易殘留舊的 buffer，造成疊影與破圖。
+--   因此使用 WebGpu（此版本的預設前端），並以 LowPower 指定 Intel 內顯，
+--   讓算繪與輸出在同一張顯卡上，避免跨 adapter 導致 alpha 失效。
 config.front_end = 'WebGpu'
 config.webgpu_power_preference = 'LowPower'
 
--- ★ max_fps 120 → 60(官方預設)。
---   LowPower 是刻意挑 Intel 內顯(理由見上)，那張卡要在 191 PPI @150% 的面板上
---   推一個 0.90 透明的視窗 —— 而透明視窗每一幀都要 DWM 合成整個視窗。
---   TUI 從 60 拉到 120 幀肉眼看不出差別，GPU 與合成器的工作量卻是兩倍。
+-- 使用官方預設的 60 fps。
+--   Intel 內顯需在 191 PPI、150% 縮放的面板上算繪透明視窗，且每一幀都要由 DWM 合成；
+--   終端機程式在 120 fps 下看不出差異，GPU 與合成器的負載卻加倍。
 config.max_fps = 60
 
--- ★ animation_fps 60 → 10(官方預設)。這個值只管一件事：
---   閃爍游標 / 閃爍文字 / visual bell 的「緩動」算繪幀率。
---   配上下面的 EaseInOut，等於這個透明視窗每秒被重繪 60 次跑緩動動畫 ——
---   而且是在完全沒有操作的時候也一直跑。回到預設的 10 已經砍掉 6/7 的
---   閒置重繪，同時保留你要的平滑閃爍。
---   若之後測下來還想再壓：官方對低算繪資源環境的建議是
---     animation_fps = 1 + cursor_blink_ease_in/out = 'Constant'
---   那會完全關掉緩動、變成乾淨的開/關閃爍，是本檔案裡最後一格可壓的空間。
+-- 使用官方預設的 10 fps。
+--   此值僅控制閃爍游標、閃爍文字與 visual bell 的緩動動畫幀率；
+--   搭配 EaseInOut 時，即使沒有任何操作也會持續以此幀率重繪。
+--   若需進一步降低負載，官方建議低資源環境使用
+--     animation_fps = 1，並將 cursor_blink_ease_in / out 設為 'Constant'，
+--   此時游標改為無緩動的開關閃爍。
 config.animation_fps = 10
 
--- ★ 191 PPI 面板 @150% 縮放 = 等效 144 DPI，屬於高 DPI 環境。
---   高 DPI 下 hinting 反而有害:它會把字元輪廓「掰」去對齊像素格,
---   在每 em 有足夠像素時只是徒然扭曲字形。關掉才拿得到字體設計的真實曲線。
+-- 191 PPI 面板在 150% 縮放下等效 144 DPI，屬於高 DPI 環境。
+--   高 DPI 下 hinting 會將字形輪廓強制對齊像素格而扭曲字形，因此關閉。
 config.freetype_load_flags = 'NO_HINTING'
 config.freetype_load_target = 'Light'
--- ★ 透明背景上用 LCD 次像素抗鋸齒(HorizontalLcd)字緣會出現彩色毛邊(色散);
---   原因:次像素算繪必須確知背景色才能正確分配 RGB 子像素能量,
---   而透明視窗的背景是 DWM 事後合成的 → 資訊上不可能算對,不是調參數能解的。
---   故維持 'Normal'(灰階抗鋸齒)。想用 HorizontalLcd 就得先把透明度關掉。
+-- 使用灰階抗鋸齒（'Normal'），不使用 HorizontalLcd。
+--   次像素抗鋸齒需要已知背景色才能正確分配 RGB 子像素，
+--   但透明視窗的背景由 DWM 事後合成，字緣會出現彩色毛邊；
+--   若要改用 HorizontalLcd，須先關閉透明度。
 config.freetype_render_target = 'Normal'
 
--- ★ update-status 預設每 1 秒重跑一次,而它裡面有 battery_info()(Windows 上是同步查詢)
---   和 get_foreground_process_name()。右側只顯示到「分鐘」,2 秒更新一次看不出差別,
---   但背景輪詢直接砍半。
+-- update-status 預設每秒執行一次，其中 battery_info()（Windows 上為同步查詢）
+--   與 get_foreground_process_name() 都有成本；狀態列只顯示到分鐘，
+--   改為每 2 秒更新即可將輪詢次數減半。
 config.status_update_interval = 2000
 
--- ★ 有工具會印出 U+EA12 / U+EA54 這類碼位。它們落在 Nerd Fonts 的
---   Devicons(…E8EF) 與 Codicons(EA60…) 之間的未分配空隙 —— 不存在於任何 Nerd Font,
---   所以「再裝一套字型」永遠救不了,只會一直跳彈窗。字仍會顯示成佔位方框。
---   (已驗證 E5FA/E702/EA60/EA71/F07B/F17A 都正常命中 JetBrainsMono Nerd Font,
---    字型安裝本身是好的。)
+-- 關閉缺字警告。
+--   部分工具會輸出 U+EA12、U+EA54 等碼位，這些碼位位於 Nerd Fonts 的
+--   Devicons（至 E8EF）與 Codicons（自 EA60）之間的未分配區段，任何字型都不包含，
+--   安裝其他字型也無法解決，只會反覆跳出警告；該字元仍會顯示為方框。
+--   已確認 E5FA、E702、EA60、EA71、F07B、F17A 均可由 JetBrainsMono Nerd Font 正常顯示。
 config.warn_about_missing_glyphs = false
 
 config.audible_bell = 'Disabled'
@@ -271,21 +282,22 @@ config.visual_bell = {
 config.scrollback_lines = 20000
 config.hyperlink_rules = wezterm.default_hyperlink_rules()
 
--- 關掉檢查與更新提示 (已刪除 deprecated 的 show_update_window)
+-- 關閉更新檢查與提示
 config.check_for_updates = false
 
 --------------------------------------------------------------------
--- 8. 終端核心與編碼修復 (強制全域 UTF-8，杜絕 Python/Git 中文亂碼)
+-- 8. Shell 與編碼（統一使用 UTF-8，避免 Python、Git 的中文亂碼）
 --------------------------------------------------------------------
--- ★ 原本結尾還有 `chcp 65001 > $null`,已移除:那是一次多餘的 process spawn(~34ms/分頁)。
---   .NET 的 [Console]::OutputEncoding / InputEncoding setter 內部就會呼叫
---   SetConsoleOutputCP / SetConsoleCP(65001),效果完全等同 chcp。
---   (實測:父行程 cp=950 時,只設這兩行,子行程的 chcp 回報 65001;不設則停在 950。)
+-- 設定 [Console]::OutputEncoding / InputEncoding 時，.NET 內部即會呼叫
+--   SetConsoleOutputCP / SetConsoleCP(65001)，效果等同 chcp 65001，
+--   因此不需要再執行 chcp（每個分頁可省下一次約 34ms 的行程啟動）。
+--   已驗證：父行程為 cp950 時，設定後子行程的 chcp 回報 65001。
 local ps_utf8 = '[Console]::OutputEncoding=[Text.Encoding]::UTF8; [Console]::InputEncoding=[Text.Encoding]::UTF8'
--- pwsh.exe = PowerShell 7（與系統內建的 5.1 powershell.exe 並存，不是取代）
-config.default_prog = { 'pwsh.exe', '-NoLogo', '-NoExit', '-Command', ps_utf8 }
+-- pwsh.exe 為 PowerShell 7，與系統內建的 powershell.exe（5.1）並存
+local pwsh_args = { 'pwsh.exe', '-NoLogo', '-NoExit', '-Command', ps_utf8 }
+config.default_prog = pwsh_args
 
--- 全方位的編碼環境變數鎮壓，保證底層 POSIX 工具與編譯輸出中文零亂碼
+-- 讓 POSIX 工具與編譯器輸出一律使用 UTF-8
 config.set_environment_variables = { 
   LANG = 'en_US.UTF-8',
   LC_ALL = 'en_US.UTF-8',
@@ -294,16 +306,16 @@ config.set_environment_variables = {
 }
 
 config.launch_menu = {
-  { label = 'PowerShell 7',   args = { 'pwsh.exe', '-NoLogo', '-NoExit', '-Command', ps_utf8 } },
+  { label = 'PowerShell 7',   args = pwsh_args },
   { label = 'Windows PowerShell 5.1', args = { 'powershell.exe', '-NoLogo', '-NoExit', '-Command', ps_utf8 } },
   { label = 'Ubuntu (WSL)', args = { 'wsl.exe', '-d', 'Ubuntu', '--cd', '~' } },
   { label = 'CMD',        args = { 'cmd.exe', '/k', 'chcp 65001 > nul' } },
 }
 
 --------------------------------------------------------------------
--- 9. 順手多工熱鍵 (Tmux 式分屏 / 毫秒秒切 / 調整大小)
+-- 9. 鍵位：分割窗格、切換、調整大小、分頁
 --------------------------------------------------------------------
--- Ctrl+C：有反白文字時複製；沒有選取時才把 Ctrl+C 傳給 shell 中斷工作。
+-- Ctrl+C：有選取文字時複製；沒有選取時將 Ctrl+C 傳給前景程式以中斷執行。
 local copy_selection_or_interrupt = wezterm.action_callback(function(window, pane)
   local selection = window:get_selection_text_for_pane(pane)
   if selection and selection ~= '' then
@@ -313,23 +325,19 @@ local copy_selection_or_interrupt = wezterm.action_callback(function(window, pan
   end
 end)
 
--- ★ Ctrl+V 曾經短暫做過「前景行程是 yazi 就放行」的特例，已於 2026-08-09 移除 ——
---   yazi 那邊的 <C-v> 綁定在鍵位瘦身時砍掉了(貼上統一走 p)，特例失去服務對象。
---
---   但那個 bug 值得記著，因為它會再發生：無條件的 PasteFrom 會把剪貼簿
---   「文字」送進前景 TUI，而 yazi 這類程式把每個字元都當按鍵解讀 ——
---   剪貼簿裡若有路徑，那個 : 就是 shell --block --interactive，於是憑空
---   跳出一個提示字元、後面的字全被打進去，看起來就像整個程式卡住/亂掉。
---   所以：日後若又想在某個 TUI 裡用 Ctrl+V，別直接改成無條件 SendKey，
---   照 copy_selection_or_interrupt 的模式用 action_callback 判斷前景行程。
+-- 注意：Ctrl+V 以 PasteFrom 將剪貼簿文字送入前景程式。
+--   yazi 等 TUI 會將每個字元當成按鍵解讀，例如路徑中的「:」會開啟 shell 指令提示，
+--   其後的字元全被輸入到提示中。若需讓特定 TUI 自行處理 Ctrl+V，
+--   請比照 copy_selection_or_interrupt，以 action_callback 判斷前景行程，
+--   不要改成無條件的 SendKey。
 
 config.keys = {
-  -- 分屏 (| 直線=左右並排 / - 橫線=上下並排)
+  -- 分割窗格（| 為左右並排，- 為上下並排）
   { key = '|',  mods = 'ALT|SHIFT', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
   { key = '\\', mods = 'ALT|SHIFT', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
   { key = '-',  mods = 'ALT|SHIFT', action = act.SplitVertical   { domain = 'CurrentPaneDomain' } },
   { key = '_',  mods = 'ALT|SHIFT', action = act.SplitVertical   { domain = 'CurrentPaneDomain' } },
-  -- 分屏間秒切 (Alt + HJKL 及 方向鍵)
+  -- 切換窗格（Alt + HJKL 或方向鍵）
   { key = 'h', mods = 'ALT', action = act.ActivatePaneDirection 'Left' },
   { key = 'j', mods = 'ALT', action = act.ActivatePaneDirection 'Down' },
   { key = 'k', mods = 'ALT', action = act.ActivatePaneDirection 'Up' },
@@ -338,19 +346,19 @@ config.keys = {
   { key = 'DownArrow',  mods = 'ALT', action = act.ActivatePaneDirection 'Down' },
   { key = 'UpArrow',    mods = 'ALT', action = act.ActivatePaneDirection 'Up' },
   { key = 'RightArrow', mods = 'ALT', action = act.ActivatePaneDirection 'Right' },
-  -- 鍵盤調整分屏大小 (Alt + Shift + HJKL)
+  -- 調整窗格大小（Alt + Shift + HJKL）
   { key = 'h', mods = 'ALT|SHIFT', action = act.AdjustPaneSize { 'Left', 4 } },
   { key = 'j', mods = 'ALT|SHIFT', action = act.AdjustPaneSize { 'Down', 4 } },
   { key = 'k', mods = 'ALT|SHIFT', action = act.AdjustPaneSize { 'Up', 4 } },
   { key = 'l', mods = 'ALT|SHIFT', action = act.AdjustPaneSize { 'Right', 4 } },
-  -- 分頁 / 分區管理
+  -- 分頁與窗格管理
   { key = 't', mods = 'CTRL|SHIFT', action = act.SpawnTab 'CurrentPaneDomain' },
   { key = 'w', mods = 'CTRL|SHIFT', action = act.CloseCurrentTab { confirm = false } },
   { key = 'w', mods = 'ALT',        action = act.CloseCurrentPane { confirm = false } },
   { key = 'z', mods = 'ALT',        action = act.TogglePaneZoomState },
   { key = 'Tab', mods = 'CTRL',        action = act.ActivateTabRelative(1) },
   { key = 'Tab', mods = 'CTRL|SHIFT',  action = act.ActivateTabRelative(-1) },
-  -- ★ 直接跳到第 N 個分頁 (Ctrl+1~8),Ctrl+9 = 最後一個
+  -- 跳到第 N 個分頁（Ctrl+1～8），Ctrl+9 為最後一個分頁
   { key = '1', mods = 'CTRL', action = act.ActivateTab(0) },
   { key = '2', mods = 'CTRL', action = act.ActivateTab(1) },
   { key = '3', mods = 'CTRL', action = act.ActivateTab(2) },
@@ -360,13 +368,13 @@ config.keys = {
   { key = '7', mods = 'CTRL', action = act.ActivateTab(6) },
   { key = '8', mods = 'CTRL', action = act.ActivateTab(7) },
   { key = '9', mods = 'CTRL', action = act.ActivateTab(-1) },
-  -- ★ 分頁前後快切
+  -- 切換到上一個／下一個分頁
   { key = '[', mods = 'ALT', action = act.ActivateTabRelative(-1) },
   { key = ']', mods = 'ALT', action = act.ActivateTabRelative(1) },
-  -- ★ 分屏標號跳轉:跳出大字母,按字母瞬移到該分屏
+  -- 窗格選取：每個窗格顯示一個字母，按下對應字母即切換到該窗格
   { key = ' ', mods = 'CTRL|SHIFT', action = act.PaneSelect { alphabet = 'asdfghjkl' } },
-  -- 複製 / 貼上 / 指令面板
-  -- Ctrl+V 由 WezTerm 直接貼文字，避免前景 CLI 把它解讀成「貼上圖片」。
+  -- 複製、貼上、指令面板
+  -- Ctrl+V 由 WezTerm 直接貼上文字，避免前景 CLI 將其解讀為貼上圖片。
   { key = 'c', mods = 'CTRL',       action = copy_selection_or_interrupt },
   { key = 'v', mods = 'CTRL',       action = act.PasteFrom 'Clipboard' },
   { key = 'c', mods = 'CTRL|SHIFT', action = act.CopyTo 'Clipboard' },
@@ -374,22 +382,22 @@ config.keys = {
   { key = 'Insert', mods = 'CTRL',  action = act.CopyTo 'Clipboard' },
   { key = 'Insert', mods = 'SHIFT', action = act.PasteFrom 'Clipboard' },
   { key = 'p', mods = 'CTRL|SHIFT', action = act.ActivateCommandPalette },
-  -- ★ 透明度即時切換 (Ctrl+Shift+B):在 0.90(玻璃) 與 1.0(實色) 之間來回,不必改設定檔重載。
-  --   透明視窗每一幀都要 DWM 合成整個視窗,是 Windows 上打字延遲的常見來源。
-  --   兩邊各打幾行字比一比:有感 → 這是你的取捨;沒感 → 這條嫌疑可以直接排除。
+  -- Ctrl+Shift+B：切換透明度（OPACITY 與 1.0），不需修改設定檔。
+  --   透明視窗每一幀都需 DWM 合成，是 Windows 上輸入延遲的常見原因；
+  --   可藉此比較兩種狀態下的輸入延遲。
   { key = 'b', mods = 'CTRL|SHIFT', action = wezterm.action_callback(function(window, _)
       local o = window:get_config_overrides() or {}
-      o.window_background_opacity = (o.window_background_opacity == 1.0) and 0.90 or 1.0
+      o.window_background_opacity = (o.window_background_opacity == 1.0) and OPACITY or 1.0
       window:set_config_overrides(o)
     end) },
 }
 
 --------------------------------------------------------------------
--- 10. 滑鼠：選取自動複製 + 點擊開連結
+-- 10. 滑鼠：選取即複製、Ctrl+點擊開啟連結
 --------------------------------------------------------------------
 config.mouse_bindings = {
   { event = { Up = { streak = 1, button = 'Left' } }, mods = 'NONE',
-    -- Windows 沒有 X11 Primary Selection；只寫系統 Clipboard 可減少非同步競爭。
+    -- Windows 沒有 X11 Primary Selection；只寫入系統剪貼簿，減少非同步競爭。
     action = act.CompleteSelectionOrOpenLinkAtMouseCursor 'Clipboard' },
   { event = { Up = { streak = 1, button = 'Left' } }, mods = 'CTRL',
     action = act.OpenLinkAtMouseCursor },

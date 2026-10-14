@@ -23,16 +23,24 @@ return {
     '.git',
   },
 
-  -- 使用專案的 .venv 解析 import。
+  -- 決定用哪個 Python 解析 import。
   --   basedpyright 預設以系統 Python 解析 import，而本機全域 site-packages 刻意保持為空，
-  --   導致專案中的 `import requests` 等皆被標為找不到模組，補全也無結果。
-  --   server 啟動時若在專案根目錄找到 .venv，便將直譯器指向該處。
+  --   導致 `import requests` 等皆被標為找不到模組，補全也無結果。依序嘗試：
+  --     1. 專案根目錄的 .venv（uv 管理的專案）
+  --     2. 目前啟用的 conda 環境（機器學習與資料科學）：先 conda activate 再開 nvim。
+  --        base 除外：PowerShell 的 conda hook 每次開 shell 都會自動啟用 base，
+  --        若採用 base，所有沒有 .venv 的檔案都會被導到 base。
+  --   conda 的判斷不依賴專案根目錄：單檔練習腳本通常沒有 pyproject.toml 或 .git。
   on_init = function(client)
+    local py
     local root = client.config.root_dir
-    if not root then return end
-
-    local py = root .. '/.venv/Scripts/python.exe' -- Windows 的 venv 目錄結構
-    if vim.fn.executable(py) ~= 1 then return end
+    if root and vim.fn.executable(root .. '/.venv/Scripts/python.exe') == 1 then -- Windows 的 venv 目錄結構
+      py = root .. '/.venv/Scripts/python.exe'
+    elseif vim.env.CONDA_PREFIX and vim.env.CONDA_DEFAULT_ENV ~= 'base'
+        and vim.fn.executable(vim.env.CONDA_PREFIX .. '/python.exe') == 1 then
+      py = vim.env.CONDA_PREFIX .. '/python.exe'
+    end
+    if not py then return end
 
     client.settings = vim.tbl_deep_extend('force', client.settings or {}, {
       python = { pythonPath = py },

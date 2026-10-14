@@ -19,7 +19,7 @@ C:\Users\shawn\.config\wezterm\                        ← 指標
 
 **推論（這幾點最常被忘記）：**
 
-- **沒有同步步驟。** 沒有 install/sync/copy 要跑。改完就 `git commit`。
+- **沒有同步步驟。** 沒有 install/sync/copy 要跑。改完先跑 `.\check.ps1`（約 10 秒、全在背景），全綠再 `git commit`。
 - 在 `~/.config/...` 改 和 在 repo 改 是**同一個動作**，改哪邊都會立刻反映到另一邊。
 - `install.ps1` 只在三種時候跑：① 新機器 ② 新增模組要多一條 link ③ link 斷了要修。
 
@@ -105,6 +105,7 @@ PowerShell 變數**不分大小寫**：`$R` 和 `$r` 是同一個變數。寫迴
 ```powershell
 cd D:\Project\dotfiles
 
+.\check.ps1                # 行為檢查：yazi/wezterm 設定沒被退回預設、nvim 外掛與預覽、.ps1 BOM 與語法
 .\install.ps1 -Verify      # 健檢：link 狀態 + 核心工具 + Developer Mode
 .\install.ps1 -WhatIf      # 預覽，不動任何東西
 .\install.ps1              # 部署（既有內容先 Move 到 ~/.dotfiles-backup/<timestamp>/）

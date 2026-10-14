@@ -37,8 +37,9 @@ dotfiles/
 ├─ docs/                          ← repo 自己的模組說明（不會被部署出去）
 ├─ skills/dotfiles/               ← 本 repo 的維護規則。專案專用，不進全域 skills
 ├─ bootstrap/
-│  └─ winget-core.json            重灌時要裝的 24 個套件
-├─ install.ps1                    部署 / 健檢
+│  └─ winget-core.json            重灌時要裝的 25 個套件
+├─ install.ps1                    部署 / 健檢（連結、PATH、工具）
+├─ check.ps1                      設定的行為檢查（設定有沒有被退回預設、外掛、預覽）
 └─ README.md
 ```
 
@@ -65,7 +66,7 @@ cd D:\Project\dotfiles
 | 階段 | 做什麼 | 失敗的後果 |
 |---|---|---|
 | 1 | 建立 13 條 symlink，以及讓 nvim、yazi 的預設設定位置指向 `.config` 的 2 條 junction；既有內容先 **Move**（不是複製、不是刪）到 `~/.dotfiles-backup/<timestamp>/`。另外設定 User 環境變數 `YAZI_CONFIG_HOME` | 中斷——這是核心，有任何一條失敗就不會執行階段 2、3 |
-| 2 | `winget` 裝 `bootstrap/winget-core.json` 的 24 個套件；裝完後把 7-Zip、Sublime Text 補進 User PATH（兩者的安裝程式都不會自己加） | 該工具不可用，其餘照常 |
+| 2 | `winget` 裝 `bootstrap/winget-core.json` 的 25 個套件；裝完後把 7-Zip、Sublime Text 補進 User PATH（兩者的安裝程式都不會自己加） | 該工具不可用，其餘照常 |
 | 3 | `npm i -g ccstatusline`、`cargo install --git .../rtk`、Claude Code、uv，以及用 `uv tool install` 裝 nvim 的 Python LSP（basedpyright、ruff） | 對應功能失效，終端機本身不受影響 |
 
 `winget-core.json` 的判準是「**這份配置跑不跑得起來**」，不是「這台機器裝了什麼」（機器上共 102 個 winget 套件）。容易被漏掉的是 yazi 內建預覽呼叫的那幾支——它們不出現在 `yazi.toml` 裡，因為是預設行為：
@@ -76,6 +77,7 @@ cd D:\Project\dotfiles
 | `jqlang.jq` | `jq` | JSON 預覽變純文字 |
 | `oschwartz10612.Poppler` | `pdftoppm` | PDF 無法預覽 |
 | `ImageMagick.ImageMagick` | `magick` | SVG / HEIC / 字型無法預覽 |
+| `hpjansson.Chafa` | `chafa` | 在 nvim 裡開 yazi（`\y`）時圖片預覽一片空白（nvim 的終端機不支援圖形協定） |
 | `voidtools.Everything` + `.Cli` | 服務 + `es.exe` | `everything.yazi`（`` <F4> / `e ``）整個失效 |
 | `7zip.7zip` | `7z` | 壓縮檔無法預覽或解壓 |
 | `tree-sitter.tree-sitter-cli` | `tree-sitter` | nvim 無法編譯 treesitter parser，C++ / Python 等只剩基本上色（啟動時會提示一次） |
@@ -106,10 +108,21 @@ Sublime Text 這類編輯器的「原子存檔」是寫暫存檔再 rename 蓋�
 
 ```powershell
 cd D:\Project\dotfiles
+.\check.ps1               # 約 10 秒，全部在背景執行，不開任何視窗
 git add -A && git commit -m "..." && git push
 ```
 
-就這樣。**不需要任何 install / sync / copy 指令。**
+**不需要任何 install / sync / copy 指令。** `check.ps1` 檢查的是那些「壞了也不會報錯」的地方：
+
+| 檢查 | 為什麼需要 |
+|---|---|
+| yazi 設定是否被退回預設 | `yazi.toml` / `keymap.toml` 任一值不合法，整組設定退回預設，症狀只是自訂鍵位全部失效 |
+| `wezterm.lua` 語法 | 有錯時 WezTerm 同樣改用預設設定 |
+| nvim 啟動錯誤、LSP 執行檔、treesitter parser、checkhealth | 外掛錯誤被 `plugins.lua` 的 pcall 攔下，只閃過一行通知 |
+| nvim 開目錄 → yazi、圖片預覽、環境變數還原 | 依賴包裝 `require('yazi').yazi`，yazi.nvim 更新後可能悄悄失效 |
+| `.ps1` 的 BOM 與 5.1 / 7 語法 | 少了 BOM 只有 5.1 會壞 |
+
+`vim.pack.update()` 或升級 yazi / WezTerm 之後也跑一次。結束碼為失敗項目數，全部通過為 0；`-Quick` 跳過最慢的 nvim + yazi 實測。
 
 ### `install.ps1` 只在三種時候跑
 

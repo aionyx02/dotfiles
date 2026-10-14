@@ -1,38 +1,21 @@
 # =====================================================================
 #  Yazi 主設定（主要用於 Windows，與 WSL 共用）
-#  設定採跨平台寫法：openers 以 for = "windows" / "unix" 區分，
-#  在 WSL 中以 ln -s 連結到此目錄即可直接使用，不需維護第二份。
+#  openers 以 for = "windows" / "unix" 區分，WSL 中以 ln -s 連結此目錄即可使用。
+#  未列出的項目皆沿用 yazi 預設值：
+#    https://github.com/sxyazi/yazi/blob/main/yazi-config/preset/
 #
-#  未列出的項目皆沿用 yazi 預設值（ratio、排序、隱藏檔、linemode 等）。
-#  預設值請見 https://github.com/sxyazi/yazi/blob/main/yazi-config/preset/。
+#  各設定的調查過程與原始碼依據：docs/yazi.md（repo 內，不會部署）。
+#  修改本檔後請跑 .\check.ps1：任一值不合法時，yazi 會把整組設定
+#  （包括 keymap.toml）退回預設值，症狀只是自訂鍵位全部失效。
 # =====================================================================
 
 # ---------------------------------------------------------------------
 # 預覽品質
 # ---------------------------------------------------------------------
-# WezTerm 使用 kitty graphics protocol，可顯示比預設更高的解析度。
-# 預設的 600x900 在本機螢幕上會被放大，quality 75 的壓縮痕跡在檢視照片時清晰可見。
-#
-# image_filter 不改為 lanczos3：
-#   畫質提升主要來自解析度（像素量約 3.5 倍），lanczos3 只略微提升邊緣銳利度，
-#   濾波成本卻高出 3～5 倍（6-tap 對 2-tap），維持 triangle 最符合成本效益。
-#
-# 使用 toggle-pane（T 鍵）將預覽擴展為全寬時，以下兩個上限即為實際畫質上限。
-#
-# image_delay 必須隨上述三個值一併調高，否則捲動時會出現卡頓。
-#   官方定義為「送出圖片預覽資料前至少等待的毫秒數」，預設值 30 是針對
-#   600x900、quality 75 所設。此處像素量為預設的 3.5 倍，且 JPEG 品質提高到 90，
-#   單張成本明顯較高，30ms 的節流不足：
-#   Windows 預設的按鍵重複速率約每秒 30 次（每次約 33ms），剛好超過門檻，
-#   因此按住方向鍵捲動相簿時，幾乎每一格都會完整執行
-#   「解碼 → 縮放 → q90 編碼 → base64 → 寫入終端機」。
-#
-# 注意：image_delay 的有效範圍為 0～100，官方文件未載明上限。
-#   超出範圍時 yazi 會顯示
-#   「Press <Enter> to continue with preset settings...」，並將整組使用者設定
-#   （包括 keymap.toml）退回預設值，症狀是所有自訂鍵位失效，而非預覽異常。
-#   修改 yazi.toml 後，應先確認 yazi 啟動時沒有出現此提示。
-#   此處取上限 100，為預設值 30 的 3.3 倍。
+# 預設 600x900、q75 在本機螢幕上會被放大，壓縮痕跡明顯；這兩個上限也是
+#   T（預覽全寬）時的實際畫質上限。image_filter 維持 triangle，見 docs。
+# image_delay 必須隨畫質一併調高，否則按住方向鍵捲動相簿會卡頓。
+#   有效範圍 0～100（官方文件未載明），超出會讓整組設定退回預設。
 [preview]
 max_width     = 1200
 max_height    = 1600
@@ -42,41 +25,17 @@ image_delay   = 100
 # ---------------------------------------------------------------------
 # 開啟方式
 # ---------------------------------------------------------------------
-# 只覆寫 edit，其餘（open、play、reveal、extract、trash 等）皆沿用預設值。
-# 以下功能已由預設值提供，不需自行設定：
-#   reveal  = explorer /select,%s1   → 在檔案總管中選取
-#   extract = ya pub extract         → 解壓縮（使用 7-Zip）
-#   trash   = ya pub trash-restore   → 瀏覽與還原資源回收筒
+# 只覆寫 edit；reveal、extract、trash 等皆沿用預設值。
 [opener]
-# 清單第一條為 Enter 與 o 的預設開啟方式；nvim 排在最後，需按 O 從選單選擇。
-#   nvim 必須設 block = true：它是 TUI，需要接管整個終端機；
-#   若比照 subl 設為 orphan，會在背景與 yazi 爭用同一個畫面。
+# 第一條是 Enter 與 o 的預設；nvim 排最後，按 O 從選單選。
 #
-# 注意：nvim 不可排在 subl -w 之前，此順序不僅影響選單。
-#   批次重新命名（選取多個檔案後按 r）使用的是第一條 block = true 的規則，
-#   見原始碼 YAZI.opener.block(&r) → .find(|r| r.block)（v26.5.6）。
-#   若 nvim 排在前面，批次重新命名會改用 nvim 開啟，而 Enter 的行為不變，不易察覺。
+# 順序不可調換：批次重新命名（多選後按 r）使用第一條 block = true 的規則，
+#   nvim 排在 subl -w 之前會讓批次重新命名改用 nvim，而 Enter 看起來不變。
+# nvim 必須 block = true：它是 TUI，設為 orphan 會與 yazi 爭用畫面。
 #
-# nvim 規則使用 `if defined NVIM` 的原因：
-#   `open --interactive`（內建的 O 與本設定的 `o）在 --chooser-file 模式下
-#   不會交回 chooser。原始碼 yazi-actor/src/mgr/open.rs 的第一個判斷為
-#       if !opt.interactive && ARGS.chooser_file.is_some() { …交回 chooser… }
-#   interactive 模式不符合此條件，因此會實際執行下列 opener 規則。
-#   從 nvim 以 \y（yazi.nvim）開啟的 yazi 必定帶有 --chooser-file，
-#   此時按 O 選擇 nvim，會在 nvim 開啟 yazi 的浮動終端機中再開一個 nvim，
-#   兩個 nvim 開啟同一檔案會產生 swap 衝突（E325）。
-#   Enter 不受影響：它不是 interactive，一律交回 chooser。
-#
-#   NVIM 是 nvim 注入給 pty job 的環境變數（值為 server pipe 位址），
-#   獨立執行的 yazi 沒有此變數，可據此判斷是否在 nvim 中執行。
-#   在 nvim 中時改為執行 `ya emit open`，讓 yazi 再執行一次非 interactive 的 open，
-#   此時會進入上述的 chooser 分支，效果等同按 Enter，由外層 nvim 開啟檔案。
-#
-#   不使用 `nvim --server %NVIM% --remote`：--remote 會在目前視窗開啟檔案，
-#     而目前視窗正是執行 yazi 的浮動視窗，檔案會覆蓋 yazi 的畫面。
-#   限制：在 nvim 中以 :terminal 執行 yazi（沒有 --chooser-file）時按 O 選擇 nvim，
-#     會改用第一條規則 subl 開啟。不會產生巢狀 nvim，此為刻意的取捨。
-#   desc 必須明確寫 "nvim"：未設定時 yazi 取 run 的第一個字，選單會顯示 "if"。
+# if defined NVIM：從 nvim（\y）開的 yazi 中按 O 選 nvim 時，改由外層 nvim 開檔，
+#   避免在浮動視窗裡再開一個 nvim（swap 衝突 E325）。原理見 docs。
+# desc 必須明寫 "nvim"，否則選單會顯示 run 的第一個字 "if"。
 edit = [
 	{ run = 'subl %s',          desc = "subl",         for = "windows", orphan = true },
 	{ run = 'subl -w %s',       desc = "subl (block)", for = "windows", block  = true },
@@ -88,13 +47,10 @@ edit = [
 # ---------------------------------------------------------------------
 # 外掛：fetcher 註冊
 # ---------------------------------------------------------------------
-# 各外掛 README 中的 id 欄位僅 Yazi v26.1.22 以前需要。
-#   本機版本為 26.5.6，因此一律省略 id；README 的寫法是舊版格式。
+# 外掛 README 中的 id 欄位只有 v26.1.22 以前需要，此處一律省略。
 
-# mime-ext：以副檔名資料庫判斷檔案類型，取代讀取檔頭的 magic-byte 判斷。
-# Windows 沒有 file(1) 指令，改用此方式可省去一輪 I/O，
-# 在 \\wsl.localhost 等較慢的路徑上差異尤其明顯。
-# 代價：副檔名與實際內容不符的少數檔案會被誤判。
+# mime-ext：以副檔名判斷檔案類型。Windows 沒有 file(1)，可省去讀檔頭的 I/O，
+#   在 \\wsl.localhost 上差異尤其明顯。代價是副檔名與內容不符的檔案會誤判。
 [[plugin.prepend_fetchers]]
 url   = "local://*"
 run   = "mime-ext.local"
@@ -107,9 +63,7 @@ run   = "mime-ext.remote"
 prio  = "high"
 group = "mime"
 
-# git：在檔案列表以 linemode 顯示 modified、added、untracked、ignored 狀態。
-# 此 fetcher 為非同步：進入目錄時檔案列表立即顯示，狀態圖示稍後才出現，
-# 不會阻擋瀏覽。在大型 repo 中最多只是圖示延遲顯示，不會卡住。
+# git：以 linemode 顯示 git 狀態。非同步執行，大型 repo 中只會讓圖示晚一點出現。
 [[plugin.prepend_fetchers]]
 url   = "*"
 run   = "git"

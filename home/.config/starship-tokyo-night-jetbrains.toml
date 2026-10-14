@@ -1,6 +1,6 @@
 "$schema" = "https://starship.rs/config-schema.json"
 
-# JetBrains-safe adaptation of the downloaded Tokyo Night preset.
+# 由 Tokyo Night preset 改寫，可在 JetBrains 內建終端機中正常顯示。
 add_newline = false
 command_timeout = 1000
 
@@ -12,6 +12,7 @@ $git_status\
 [](fg:#394260 bg:#212736)\
 $nodejs\
 $bun\
+$conda\
 $python\
 $rust\
 $golang\
@@ -54,6 +55,10 @@ version_format = "${raw}"
 [bun]
 format = "[ bun $version ](bold fg:#c0caf5 bg:#212736)"
 version_format = "${raw}"
+
+[conda]
+ignore_base = false
+format = "[ conda $environment ](bold fg:#9ece6a bg:#212736)"
 
 [python]
 format = "[ py $version( $virtualenv) ](bold fg:#7dcfff bg:#212736)"

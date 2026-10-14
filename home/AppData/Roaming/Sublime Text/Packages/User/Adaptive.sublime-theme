@@ -1,17 +1,17 @@
 {
-	// 覆寫內建 Adaptive 佈景，把「不跟著配色走」的硬編碼灰色換成 Tokyo Night。
-	// Sublime 會合併所有套件裡同名的 .sublime-theme，User 這份優先權最高，
-	// 所以這裡只寫要改的部分，其餘全部沿用內建。
+	// 覆寫內建的 Adaptive 佈景，將不隨配色方案變化的固定灰色改為 Tokyo Night 色系。
+	// Sublime 會合併所有套件中同名的 .sublime-theme，User 目錄中的檔案優先順序最高，
+	// 因此此處只定義要修改的部分，其餘沿用內建設定。
 	//
-	// 原則：不覆寫 title_bar 與 status_button —— 那兩項牽涉視窗控制鈕的顯示，
-	//       交給內建處理最安全。這裡只動「顏色」，不動「有沒有這個元件」。
+	// 原則：不覆寫 title_bar 與 status_button，這兩者涉及視窗控制按鈕的顯示，
+	//       由內建設定處理最安全。此處只修改顏色，不增減任何元件。
 
 	"variables":
 	{
-		// ── Tokyo Night chrome 色盤（由暗到亮，形成層次）──
-		"tn_bar":         "#16161e",   // 分頁列底、狀態列、側邊欄
-		"tn_tab":         "#1a1b26",   // 未選取分頁（比列底亮一階 → 分頁邊界看得見）
-		"tn_tab_active":  "#292e42",   // 選取中分頁（再亮一階 → 一眼看出在哪）
+		// ── Tokyo Night 介面色票（由暗到亮）──
+		"tn_bar":         "#16161e",   // 分頁列背景、狀態列、側邊欄
+		"tn_tab":         "#1a1b26",   // 未選取的分頁（比分頁列背景亮一階，使分頁邊界可見）
+		"tn_tab_active":  "#292e42",   // 目前的分頁（再亮一階，標示目前位置）
 		"tn_divider":     "#3b4261",   // 分隔線
 		"tn_fg_dim":      "#787c99",
 		"tn_fg":          "#a9b1d6",
@@ -19,10 +19,10 @@
 		"tn_accent":      "#7aa2f7",
 		"tn_dirty":       "#e0af68",
 
-		// ── 覆寫內建硬編碼值 ──
-		// 內建是 hsl(0, 0%, 38%) 的中性灰，與 Tokyo Night 對不上
+		// ── 覆寫內建的固定色值 ──
+		// 內建為 hsl(0, 0%, 38%) 的中性灰，與 Tokyo Night 不協調
 		"adaptive_dividers": "var(tn_divider)",
-		// 內建工具提示是白底黑字，深色主題下會閃眼
+		// 內建工具提示為白底黑字，在深色主題下過於刺眼
 		"tool_tip_bg":       "var(tn_bar)",
 		"tool_tip_fg":       "var(tn_fg)",
 		"link_fg":           "var(tn_accent)",
@@ -32,20 +32,20 @@
 	[
 		// ── 上方：分頁列 ───────────────────────────────────────
 		{
-			// 分頁列的「列底」——分頁之間的空隙與右側空白區
+			// 分頁列背景：分頁之間的間隙與右側空白區域
 			"class": "tabset_control",
 			"layer0.tint": "var(tn_bar)",
 			"layer0.opacity": 1.0,
 			"tint_index": 0,
 		},
 		{
-			// 未選取分頁：比列底亮一階，讓每個分頁是看得見的方塊
+			// 未選取的分頁：比分頁列背景亮一階，使每個分頁清楚可辨
 			"class": "tab_control",
 			"layer0.tint": "var(tn_tab)",
 			"layer0.opacity": 1.0,
 		},
 		{
-			// 選取中分頁：最亮，明確標示目前位置
+			// 目前的分頁：最亮，明確標示目前位置
 			"class": "tab_control",
 			"attributes": ["selected"],
 			"layer0.tint": "var(tn_tab_active)",
@@ -61,7 +61,7 @@
 			"fg": "var(tn_fg_bright)",
 		},
 		{
-			// 未存檔的分頁標題轉黃，與 highlight_modified_tabs 呼應
+			// 未存檔的分頁標題顯示為黃色，搭配 highlight_modified_tabs 使用
 			"class": "tab_label",
 			"parents": [{ "class": "tab_control", "attributes": ["dirty"] }],
 			"fg": "var(tn_dirty)",
@@ -79,7 +79,7 @@
 			"fg": "var(tn_fg_dim)",
 		},
 		{
-			// git 分支名用強調藍，一眼可辨
+			// git 分支名稱使用強調藍色
 			"class": "vcs_status",
 			"fg": "var(tn_accent)",
 		},
@@ -99,14 +99,14 @@
 			"fg": "var(tn_fg_dim)",
 		},
 
-		// ── 搜尋 / 主控台等下方面板 ────────────────────────────
+		// ── 搜尋、主控台等下方面板 ─────────────────────────────
 		{
 			"class": "panel_control",
 			"layer0.tint": "var(tn_bar)",
 			"layer0.opacity": 1.0,
 		},
 
-		// ── 命令面板 / Goto Anything ───────────────────────────
+		// ── 命令面板與 Goto Anything ───────────────────────────
 		{
 			"class": "quick_panel",
 			"layer0.tint": "var(tn_bar)",

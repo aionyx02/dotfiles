@@ -171,7 +171,7 @@
 
 ## 10. 非鍵盤但常用
 
-- **Launch Menu**（`Ctrl+Shift+P` → 搜尋 "Launch"，或點分頁列）可切換：
+- **Launch Menu**（`Ctrl+Shift+P` → 搜尋 "Launch"；分頁列的新分頁按鈕已隱藏，所以無法用滑鼠點開）可切換：
   - PowerShell 7（預設，已強制 UTF-8）
   - Windows PowerShell 5.1
   - Ubuntu (WSL)

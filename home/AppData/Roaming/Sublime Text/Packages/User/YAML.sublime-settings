@@ -1,5 +1,5 @@
 {
-	// YAML 用 tab 會直接是語法錯誤，強制空白
+	// YAML 不允許以 tab 縮排，因此強制使用空白
 	"translate_tabs_to_spaces": true,
 	"tab_size": 2,
 

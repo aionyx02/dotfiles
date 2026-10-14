@@ -1,15 +1,14 @@
 -- =====================================================================
---  basedpyright — Python 的補全與型別檢查
+--  basedpyright：Python 的補全與型別檢查
 --
---  ★ 為什麼不是 ruff：ruff 只做 lint 與格式化，它的補全清單是空的。
---    Python 這邊是兩隻分工(兩隻都會掛在 .py 上，不衝突)：
---        basedpyright → 補全、型別、跳定義、改名
---        ruff         → 「這行有問題」的即時標示與自動修正
+--  ruff 只提供 lint 與格式化，不提供補全。
+--    Python 由兩個 server 分工，兩者同時連接 .py 檔案，互不衝突：
+--        basedpyright：補全、型別檢查、跳至定義、重新命名
+--        ruff        ：即時標示問題與自動修正
 --
---  ★ 為什麼是 basedpyright 而不是 pyright：pyright 官方版要 node，
---    basedpyright 從 PyPI 裝、自帶執行環境，剛好走你既有的 uv 路線
---    (`uv tool install basedpyright`，執行檔落在 ~\.local\bin，那個目錄
---    你的 PATH 上已經有了 —— ruff.exe 就在那)。
+--  使用 basedpyright 而非 pyright：官方 pyright 需要 node，
+--    basedpyright 可從 PyPI 安裝並自帶執行環境，可沿用 uv 的管理方式
+--    （`uv tool install basedpyright`，執行檔位於已在 PATH 上的 ~\.local\bin）。
 -- =====================================================================
 
 return {
@@ -24,15 +23,15 @@ return {
     '.git',
   },
 
-  -- ★ 這裡是 uv 使用者的關鍵一步：basedpyright 預設是拿「系統 python」去解析
-  --   import，而你的 site-packages 是刻意淨空的 —— 於是專案裡每一個
-  --   `import requests` 都會被標成找不到模組，補全也全空。
-  --   這段在 server 啟動時去專案根找 .venv，找到就把直譯器指過去。
+  -- 使用專案的 .venv 解析 import。
+  --   basedpyright 預設以系統 Python 解析 import，而本機全域 site-packages 刻意保持為空，
+  --   導致專案中的 `import requests` 等皆被標為找不到模組，補全也無結果。
+  --   server 啟動時若在專案根目錄找到 .venv，便將直譯器指向該處。
   on_init = function(client)
     local root = client.config.root_dir
     if not root then return end
 
-    local py = root .. '/.venv/Scripts/python.exe' -- Windows 的 venv 佈局
+    local py = root .. '/.venv/Scripts/python.exe' -- Windows 的 venv 目錄結構
     if vim.fn.executable(py) ~= 1 then return end
 
     client.settings = vim.tbl_deep_extend('force', client.settings or {}, {
@@ -43,17 +42,17 @@ return {
   settings = {
     basedpyright = {
       analysis = {
-        -- ★ basedpyright 的原廠預設是 'recommended'，那是「所有檢查全開 + 未標
-        --   註型別一律報錯」—— 開一個正常的舊專案會滿江紅，紅到你不想看。
-        --   'standard' 是 pyright 官方版的預設值，抓真正的型別錯誤而已。
-        --   想更嚴格再往上調：basic < standard < strict < recommended。
+        -- basedpyright 預設為 'recommended'：啟用所有檢查，未標註型別一律報錯，
+        --   一般的既有專案會出現大量錯誤。
+        --   'standard' 是官方 pyright 的預設值，只檢查實際的型別錯誤。
+        --   嚴格程度：basic < standard < strict < recommended。
         typeCheckingMode = 'standard',
 
-        -- 只診斷開著的檔案。設 'workspace' 的話一開專案就會全庫掃一遍。
+        -- 只診斷已開啟的檔案；設為 'workspace' 會在開啟專案時掃描整個專案。
         diagnosticMode = 'openFilesOnly',
 
         autoSearchPaths = true,
-        useLibraryCodeForTypes = true, -- 沒有 .pyi 的套件，直接讀原始碼推型別
+        useLibraryCodeForTypes = true, -- 套件沒有 .pyi 時，從原始碼推斷型別
       },
     },
   },

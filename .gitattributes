@@ -1,13 +1,13 @@
-# 這個 repo 的檔案「就是」live config（透過 symlink），所以磁碟上的位元組
-# 必須原封不動地 round-trip——git 不能在 commit / checkout 時改寫換行。
+# 本 repo 的檔案經由 symlink 直接作為使用中的設定檔，
+# 因此檔案內容必須原樣保存，git 不可在 commit 或 checkout 時轉換換行字元。
 #
-# 這台機器的 core.autocrlf = true，若不關掉：
-#   · 181 個追蹤檔中有 131 個會被把 CRLF 正規化成 LF 存入，
-#     新機器 clone 出來的內容與現行 live config 逐位元不同
-#   · skills 裡的 *.sh（template.sh / hitl-loop.template.sh /
-#     block-dangerous-git.sh）被塞入 CRLF 後 shebang 會壞掉
-#   · profile.ps1 與 install.ps1 的 UTF-8 BOM 雖不受換行影響，
-#     但同樣沒有理由讓 git 去動它們
+# 本機的 core.autocrlf = true，若不停用轉換：
+#   · 多數追蹤中的檔案會將 CRLF 正規化為 LF 後存入，
+#     在新機器 clone 後，內容與目前使用中的設定檔不一致
+#   · skills 中的 *.sh（template.sh、hitl-loop.template.sh、
+#     block-dangerous-git.sh）被轉為 CRLF 後，shebang 會失效
+#   · profile.ps1 與 install.ps1 的 UTF-8 BOM 雖不受換行轉換影響，
+#     但同樣不應由 git 修改
 #
-# -text = 這個檔案不是文字，不要做任何換行轉換。
+# -text：將檔案視為非文字檔，不做任何換行轉換。
 * -text

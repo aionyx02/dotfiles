@@ -1,57 +1,52 @@
 # =====================================================================
 #  Yazi 鍵位
 #
-#  分成三區，用途不同，可以各自獨立刪掉：
-#    1. 外掛與行為覆寫  — 外掛必需的鍵，覆寫 l/<Enter>/f/p/h/<Left>/s/S 等
-#    2. Leader 群組     — ` 開頭的和弦，「想不起來就按 `」的出口
-#    3. Windows 功能鍵  — F2/F3/F4/F5/Delete/Backspace，接上檔案總管的既有習慣
+#  分為三區，用途各自獨立，可個別刪除：
+#    1. 外掛與行為覆寫：外掛所需的鍵位，覆寫 l、<Enter>、f、p、h、<Left>、s、S 等
+#    2. Leader 群組    ：以 ` 開頭的組合鍵，忘記鍵位時可由此查詢
+#    3. Windows 功能鍵 ：F2、F3、F4、F5、Delete、Backspace，對應檔案總管的使用習慣
 #
-#  ★★ 唯一要記住的規則（2026-08-09 瘦身後）：
-#     自訂鍵 = 原生單鍵 + Windows 功能鍵。Ctrl 系零例外。
+#  原則：自訂鍵位只使用原生單鍵與 Windows 功能鍵，不使用任何 Ctrl 組合鍵。
 #
-#     瘦身前每個動作有 2~4 個直接入口(複製可以按 y、<C-c> 或 `y)，
-#     那不是「功能多」，是每次動手前都要先想一下該按哪個 — 猶豫的成本
-#     比多背幾個鍵高。現在每個動作只有一個直接鍵，leader 是查詢層。
+#    每個動作只保留一個直接鍵位，leader 群組作為查詢用途。
+#    同一動作有多個入口（例如複製可按 y、<C-c> 或 `y）時，
+#    每次操作前都得先決定要按哪個，反而增加負擔。
 #
-#     連帶砍掉的：<C-c>(複製) <C-x>(剪下) <C-v>(貼上) <S-Delete>(永久刪除)
-#                 <C-f>(過濾)  <C-p>(fzf)  `z(fzf)
-#     其中前四個都有額外代價 — <C-c> 搶走預設的關閉分頁、<C-v> 需要
-#     wezterm.lua 開特例放行、<S-Delete> 依賴 kitty keyboard protocol
-#     不保證傳得到。砍掉之後 <C-c> 與 <C-f> 都自動還原成 yazi 預設行為。
+#    因此不綁定：<C-c>（複製）、<C-x>（剪下）、<C-v>（貼上）、<S-Delete>（永久刪除）、
+#                <C-f>（過濾）、<C-p>（fzf）、`z（fzf）
+#    其中前四個各有額外問題：<C-c> 會佔用預設的關閉分頁；<C-v> 需要 wezterm.lua
+#    特別放行；<S-Delete> 依賴 kitty keyboard protocol，不保證能傳到 yazi。
+#    不綁定後，<C-c> 與 <C-f> 皆維持 yazi 的預設行為。
 #
-#  ★ leader 為什麼不跟著砍：它不是「第二條路」，是「查詢表」。
-#    第二條路會製造猶豫(三個候選按哪個)，查詢表只在肌肉記憶失效時進場，
-#    不跟任何東西競爭。內建的 ~ 說明有 110 行英文，當查詢表太重。
+#  leader 群組不算重複入口：它是查詢表，只在忘記鍵位時使用，不與直接鍵位競爭。
+#    內建的 ~ 說明有 110 行英文，作為查詢表過於冗長。
 #
-#  ★ 設計約束：以下按鍵被 WezTerm 攔截，永遠傳不到 yazi，不可使用 —
-#    Alt+hjkl / Alt+Shift+hjkl / Alt+方向鍵 / Ctrl+1~9 / Ctrl+Tab /
-#    Alt+[ / Alt+] / Alt+z / Alt+w / Ctrl+Shift+{t,w,c,v,p,b} / Ctrl+Shift+Space /
-#    Ctrl+Insert / Shift+Insert / Ctrl+V
-#    (toggle-pane 的 README 示範綁 Ctrl+1/2/3，照抄會完全沒反應。)
+#  限制：以下按鍵會被 WezTerm 攔截，無法傳到 yazi，不可使用：
+#    Alt+hjkl、Alt+Shift+hjkl、Alt+方向鍵、Ctrl+1～9、Ctrl+Tab、
+#    Alt+[、Alt+]、Alt+z、Alt+w、Ctrl+Shift+{t,w,c,v,p,b}、Ctrl+Shift+Space、
+#    Ctrl+Insert、Shift+Insert、Ctrl+V
+#    （toggle-pane 的 README 範例綁定 Ctrl+1/2/3，在此環境下不會有反應。）
 #
-#  ★ Ctrl+C 是唯一的「有條件放行」：wezterm.lua 的 action_callback 會在
-#    終端機有反白選取時複製、沒選取才把 Ctrl+C 送進來。而這裡已經不綁
-#    <C-c> 了，所以它會落到 yazi 預設的「關閉分頁」上。
+#  Ctrl+C 會依條件傳入：wezterm.lua 的 action_callback 在終端機有選取文字時複製，
+#    沒有選取時才將 Ctrl+C 傳給 yazi。此處未綁定 <C-c>，因此會執行 yazi 預設的關閉分頁。
 #
-#  已經內建、不需要在此設定的：
-#    z = fzf   Z = zoxide   r = 改名   a = 新建檔案/目錄
-#    O = 互動選擇開啟方式   . = 切換隱藏檔   w = 背景工作   / = 找下一個
+#  以下為內建鍵位，不需在此設定：
+#    z = fzf   Z = zoxide   r = 重新命名   a = 新建檔案／目錄
+#    O = 選擇開啟方式   . = 切換隱藏檔   w = 背景工作   / = 尋找下一個
 #    y = 複製   x = 剪下   d = 刪除   D = 永久刪除
-#    <Tab> = 檔案詳細資訊(spot)   <C-a> = 全選   q = 離開
-#    <C-c> = 關閉分頁   <C-f> = 往下一頁   g<Space> = 輸入路徑跳轉   gh = 家目錄
-#    tt = 新分頁   tr = 分頁改名   1~9 = 切分頁   [ ] = 相鄰分頁
-#    cc/cd/cf/cn = 複製 路徑/目錄/檔名/主檔名   , + 鍵 = 排序   m + 鍵 = linemode
+#    <Tab> = 檔案詳細資訊（spot）   <C-a> = 全選   q = 離開
+#    <C-c> = 關閉分頁   <C-f> = 下一頁   g<Space> = 輸入路徑跳轉   gh = 家目錄
+#    tt = 新分頁   tr = 重新命名分頁   1～9 = 切換分頁   [ ] = 相鄰分頁
+#    cc/cd/cf/cn = 複製路徑／目錄／檔名／主檔名   , + 鍵 = 排序   m + 鍵 = linemode
 #
-#  ★ 26.5.6 實際上「沒有」以下三項，先前的註解寫錯了(對照 v26.5.6 的
-#    yazi-config/preset/ 逐條核對過)：
-#      A = 批次建檔     → bulk_create 這個指令在 26.5.6 還不存在(main 分支才有)
-#      gt = 回收桶      → 預設鍵位表裡沒有任何 g 開頭的回收桶綁定
-#      opener.trash     → 預設 opener 只有 edit/play/open/reveal/extract/download
-#    ★ 但 main 分支的 gt 已經綁上 `plugin trash` 了(2026-08-09 核對)，
-#      所以這條之後升級時要回頭再確認一次。
+#  v26.5.6 沒有以下功能（已對照 v26.5.6 的 yazi-config/preset/ 確認）：
+#      A = 批次建立檔案 → bulk_create 指令在 26.5.6 尚不存在（僅 main 分支有）
+#      gt = 資源回收筒  → 預設鍵位中沒有 g 開頭的回收筒綁定
+#      opener.trash     → 預設 opener 只有 edit、play、open、reveal、extract、download
+#    注意：main 分支已將 gt 綁定為 `plugin trash`，升級後須重新確認。
 # =====================================================================
 
-# l / Enter：目錄就進去，檔案就開啟。取代預設的 enter 與 open。
+# l / Enter：目錄則進入，檔案則開啟。取代預設的 enter 與 open。
 [[mgr.prepend_keymap]]
 on   = "l"
 run  = "plugin smart-enter"
@@ -63,68 +58,66 @@ run  = "plugin smart-enter"
 desc = "進入子目錄，或開啟檔案"
 
 # f：取代預設的 filter --smart。
-# 多出來的能力是「過濾到只剩一個目錄時自動進入並繼續過濾」，
-# 在 src/a/b/c 這種深層路徑穿梭時很快 — 跟 fzf(z) 是不同使用時機，
-# 這個是逐層確認，fzf 是一發入魂。
+# 額外功能：過濾到只剩一個目錄時，自動進入該目錄並繼續過濾，
+# 適合在 src/a/b/c 這類深層路徑中移動。與 fzf（z）的使用情境不同：
+# 此功能逐層確認，fzf 則一次跳到目標。
 #
-# ★ 前面那句 "arrow top" 是修 bug 用的，不能拿掉。原因：
-#   filter_do 套用過濾後會呼叫 Folder::hover() 想留住原本那個檔案，
-#   而該檔案若被濾掉，程式碼是 entries.position(key).unwrap_or(self.cursor)
-#   — 也就是「保留原本的索引」，再被夾到清單長度內。
-#   所以按 f 之前停在第 8 筆、過濾後剩 4 筆，游標就會落在第 4 筆(最後一筆)，
-#   而 smart-filter 的 Enter 開的是 hovered，於是永遠開到最下面那個。
+# 前置的 "arrow top" 用於修正錯誤，不可移除。
+#   filter_do 套用過濾後會呼叫 Folder::hover() 嘗試停留在原本的檔案；
+#   若該檔案已被濾除，程式碼為 entries.position(key).unwrap_or(self.cursor)，
+#   即保留原本的索引，再限制在清單長度內。
+#   例如按 f 前停在第 8 筆、過濾後剩 4 筆，游標會落在第 4 筆（最後一筆），
+#   而 smart-filter 的 Enter 開啟的是游標所在項目，結果總是開啟最後一筆。
 #
-#   過濾中又完全無法移動游標 — 這件事的根因不是「沒綁」，是「綁到別的東西」：
-#     [input] 預設把 <Up>/<Down> 綁在 recall -1 / recall 1(回溯輸入歷史)，
-#     而 smart-filter 用 ya.input 開的提示字元沒有歷史可回溯 → 指令有執行，
-#     只是什麼都沒發生，看起來就像死鍵。
-#   要改成移動檔案游標則確實無解(對照 yazi-fm/src/executor.rs 確認)：
-#     arrow 是 mgr 層指令，綁在 [input] 會被丟棄；而 plugin 指令只在
-#     InputMode::Normal 才派送，Insert 模式整個 match 只認得 complete 一個，
-#     提示字元開起來就是 Insert — 連寫外掛繞過都不行。
-#   官方 issue #2991 已 closed as not planned，確定不會修。
-#   想要「打字縮清單 + 上下比較」請用下面的 F；想要「打字同時上下選」用
-#   <F4>(Everything) — 那個走 fzf，是獨立行程、有自己的鍵盤處理，方向鍵天生會動。
+#   過濾中無法移動游標，原因是按鍵綁定到了其他功能：
+#     [input] 預設將 <Up> / <Down> 綁定為 recall -1 / recall 1（回溯輸入歷史），
+#     而 smart-filter 以 ya.input 開啟的輸入框沒有歷史可回溯，
+#     指令雖有執行但沒有效果，看起來就像按鍵無作用。
+#   改為移動檔案游標確實無法實現（已對照 yazi-fm/src/executor.rs 確認）：
+#     arrow 是 mgr 層指令，綁定在 [input] 會被忽略；plugin 指令只在
+#     InputMode::Normal 時派送，Insert 模式僅處理 complete，
+#     而輸入框開啟時即為 Insert 模式，因此也無法以外掛繞過。
+#   官方 issue #2991 已以 not planned 關閉。
+#   需要「輸入以縮小清單並上下比較」時使用下方的 F；需要「輸入時同時上下選擇」時使用
+#   <F4>（Everything），它透過 fzf 執行，是獨立行程，有自己的鍵盤處理，方向鍵可正常使用。
 #
-#   先跳到頂端就把索引釘在 0：不論頂端那筆有沒有被濾掉，游標都會落在
-#   「第一個符合的項目」，而且每多打一個字這個不變量都成立 —
-#   等於得到 fzf 那種「游標永遠跟著第一筆」的手感，Enter 開的就是它。
+#   先跳到頂端可將索引固定為 0：無論頂端項目是否被濾除，游標都會落在
+#   第一個符合的項目，且每多輸入一個字元皆成立，
+#   效果與 fzf 的「游標固定在第一筆」相同，Enter 開啟的即是該項目。
 [[mgr.prepend_keymap]]
 on   = "f"
 run  = [ "arrow top", "plugin smart-filter" ]
 desc = "智慧過濾：游標釘在第一筆、唯一目錄自動進入"
 
-# F：保留一份「原味」的內建過濾，跟 f 是互補而非重複。
-#   f  = 邊打邊縮，Enter 直接開第一筆    → 目標明確、想一次到位時用
-#   F  = Enter 只是收起輸入框、過濾持續生效 → 剩幾筆想上下比較時用
-#        此時 j/k/l 與方向鍵全部恢復正常，最上面那筆當然選得到，<Esc> 清除過濾。
-# 上面那個「選不到最上面」的坑，本質上就是 smart-filter 沒有這個模式。
+# F：保留內建的過濾功能，與 f 互補。
+#   f = 輸入時即時縮小清單，Enter 直接開啟第一筆    → 目標明確時使用
+#   F = Enter 只關閉輸入框，過濾持續生效            → 需要上下比較剩餘項目時使用
+#       此時 j、k、l 與方向鍵皆可正常使用，也能選取最上面的項目，<Esc> 清除過濾。
+# smart-filter 沒有這種模式，這也是前述無法選取最上面項目的原因。
 #
-# ★ 這裡的 "arrow top" 跟 f 是同一個理由、同一個 bug：filter_do 會保留原本的
-#   索引再夾到清單長度內，所以不先跳頂端的話，套用後游標一樣會掉到最後一筆。
-#   f 有寫、F 漏寫會讓兩個入口行為不一致 — 兩邊都要有。
+# 此處的 "arrow top" 與 f 的理由相同：filter_do 會保留原本的索引並限制在清單長度內，
+#   若不先跳到頂端，套用過濾後游標同樣會落在最後一筆。兩者須一致設定。
 [[mgr.prepend_keymap]]
 on   = "F"
 run  = [ "arrow top", "filter --smart" ]
 desc = "內建過濾：套用後可自由上下瀏覽"
 
-# s / S：鍵位跟預設完全一樣，只是把引擎參數補上。
+# s / S：鍵位與預設相同，僅補上搜尋引擎的參數。
 #
-# ★ 為什麼要覆寫：fd 與 rg 的預設值都相當保守 — 跳過隱藏檔、完全遵守
-#   .gitignore。在有 .gitignore 的專案裡，這會直接吃掉一大票結果，
-#   最常漏掉的就是 .env / .github/ / .vscode/ 這些天天要找的 dotfiles。
+# 覆寫原因：fd 與 rg 的預設值較保守，會略過隱藏檔並完全遵守 .gitignore。
+#   在有 .gitignore 的專案中會遺漏大量結果，
+#   最常遺漏的是 .env、.github/、.vscode/ 等經常需要搜尋的檔案。
 #
-# ★ 加了 --hidden 就「必須」同時排除 .git，否則 fd 會鑽進 .git/objects
-#   吐出好幾千筆雜訊。這是加 --hidden 的人最常踩的坑。
+# 加上 --hidden 時必須同時排除 .git，否則 fd 會搜尋 .git/objects，
+#   產生數千筆無用結果。
 #
-# ★ 刻意不加 --no-ignore：「我要看到硬碟上真正存在的每一個檔」這個需求
-#   已經由 <F4>(Everything) 接走了。s 留在專案語境裡，.gitignore 過濾
-#   反而是它的優點 — 不會被 node_modules 灌爆。
+# 不加 --no-ignore：搜尋磁碟上所有檔案的需求由 <F4>（Everything）處理。
+#   s 用於專案內搜尋，遵守 .gitignore 可避免 node_modules 等目錄淹沒結果。
 #
-# ★ 這兩個是 Everything 補不了的洞，所以不能砍：
-#     s → Everything 讀的是 NTFS 的 MFT，\\wsl.localhost 的 ext4 看不見，
-#         WSL 底下這是唯一的檔名搜尋手段
-#     S → Everything 只有檔名，完全不做內容比對
+# 這兩個鍵位涵蓋 Everything 無法處理的情況，必須保留：
+#     s：Everything 讀取 NTFS 的 MFT，無法看到 \\wsl.localhost 的 ext4，
+#        在 WSL 中這是唯一的檔名搜尋方式
+#     S：Everything 只搜尋檔名，不比對檔案內容
 [[mgr.prepend_keymap]]
 on   = "s"
 run  = "search --via=fd --args='--hidden --follow --exclude .git'"
@@ -135,16 +128,16 @@ on   = "S"
 run  = "search --via=rg --args='--hidden --glob=!.git'"
 desc = "遞迴搜內容 (ripgrep，含隱藏檔)"
 
-# p：取代預設的 paste。貼到「游標懸停的那個目錄」而不是當前目錄，
-# 省掉「先進去 → 貼上 → 再退出」這三步。
+# p：取代預設的 paste。貼到游標所在的目錄而非目前目錄，
+# 省去「進入目錄、貼上、返回」三個步驟。
 [[mgr.prepend_keymap]]
 on   = "p"
 run  = "plugin smart-paste"
 desc = "貼上到游標所在目錄"
 
 # h / <Left>：取代預設的 leave。
-# 差別只在「已經在 C:\ 這種頂層」時 — 預設是沒反應，這裡改成叫出磁碟機選單。
-# 其他所有目錄的行為與預設完全相同。
+# 只在已位於 C:\ 等最上層時有差異：預設無反應，此處改為開啟磁碟機選單。
+# 在其他目錄中的行為與預設相同。
 [[mgr.prepend_keymap]]
 on   = "h"
 run  = "plugin smart-leave"
@@ -155,28 +148,28 @@ on   = "<Left>"
 run  = "plugin smart-leave"
 desc = "回上層目錄，已到頂則切換磁碟機"
 
-# M：yazi 預設未使用，安全。官方 mount 外掛的 README 也是建議綁這個鍵，
-# 之後若哪天在 WSL 用得上 mount，鍵位習慣可以直接沿用。
-# 不必先退到頂，在任何深度都能直接跳去別的磁碟機。
+# M：yazi 預設未使用此鍵。官方 mount 外掛的 README 也建議綁定此鍵，
+# 日後若在 WSL 中使用 mount，可沿用相同的鍵位。
+# 不需先回到最上層，在任何目錄深度都能直接切換磁碟機。
 [[mgr.prepend_keymap]]
 on   = "M"
 run  = "plugin drives"
 desc = "磁碟機 / WSL 切換選單"
 
-# T：yazi 預設未使用，安全。
-# 用 max-preview 而非 min-preview — 要的是「撐成全寬看大圖」，不是隱藏預覽。
-# 再按一次還原成 ratio 設定的比例。
+# T：yazi 預設未使用此鍵。
+# 使用 max-preview 而非 min-preview：目的是將預覽擴展為全寬以檢視大圖，而非隱藏預覽。
+# 再按一次恢復為 ratio 設定的比例。
 [[mgr.prepend_keymap]]
 on   = "T"
 run  = "plugin toggle-pane max-preview"
 desc = "預覽窗全寬 / 還原"
 
-# !：yazi 預設未使用，安全。官方 tips 就是建議綁這個鍵。
-# 跟內建的 ; (shell --interactive) 與 : (shell --block --interactive) 不同 —
-# 那兩個是「跑一條指令就回來」，這個是「把整個 shell 開在當前目錄」，
-# 想連續下好幾條指令再回 yazi 時用。exit 後自動回到 yazi。
-# 用 pwsh 而非 powershell.exe：本機裝的是 PowerShell 7.6，官方範例寫的
-# powershell.exe 會叫到 Windows 內建的 5.1。
+# !：yazi 預設未使用此鍵，官方 tips 亦建議綁定此鍵。
+# 與內建的 ;（shell --interactive）及 :（shell --block --interactive）不同：
+# 後兩者執行一條指令後即返回，此鍵則在目前目錄開啟完整的 shell，
+# 適合連續執行多條指令。exit 後自動返回 yazi。
+# 使用 pwsh 而非 powershell.exe：本機安裝的是 PowerShell 7.6，官方範例中的
+# powershell.exe 會開啟 Windows 內建的 5.1。
 [[mgr.prepend_keymap]]
 on   = "!"
 for  = "windows"
@@ -191,27 +184,27 @@ desc = "在此目錄開一個 shell"
 
 
 # =====================================================================
-#  Leader 群組  ·  ` (backtick)
+#  Leader 群組（` 反引號）
 #
-#  ★ 解決的問題：mgr 層預設 110 條鍵位，其中 31 條是和弦(g* c* m* ,* t*)，
-#    按下第一鍵 yazi 會自動跳出 which-key 候選清單 — 那 31 條從來不需要背。
-#    剩下 79 條單鍵才是硬記的部分。
-#    這一區把常用動作也變成和弦，借用同一個 which-key 機制，
-#    把「要記住的鍵」從 79 個降到 1 個：想不起來就按 `。
+#  用途：mgr 層預設有 110 個鍵位，其中 31 個是組合鍵（g*、c*、m*、,*、t*），
+#    按下第一個鍵後 yazi 會自動顯示 which-key 候選清單，因此不需記憶；
+#    其餘 79 個單鍵才需要記憶。
+#    本區將常用動作也設為組合鍵，利用相同的 which-key 機制，
+#    將需要記憶的鍵位從 79 個減少為 1 個：忘記時按 ` 即可查詢。
 #
-#  ★ 純新增，預設鍵一條都沒動 —
-#    記得的人走捷徑(d 刪除)，記不得的走 leader(`d)，兩條路並存。
-#    不想要了就把這整區刪掉，其餘設定完全不受影響。
+#  本區只新增鍵位，不修改任何預設鍵位：
+#    熟悉的人使用直接鍵位（d 刪除），忘記時使用 leader（`d），兩者並存。
+#    不需要時可刪除整區，不影響其他設定。
 #
-#  ★ 選 ` 的理由：mgr 層完全未使用、不需要 Shift、位置在左上角孤立好按。
-#    留著 ' 不用是因為書籤類外掛(yamb / bunny)慣例綁在 ' 上。
-#    要換 leader 的話，把這一區的 "`" 全部取代掉即可。
+#  選用 ` 的原因：mgr 層未使用、不需按 Shift、位於鍵盤左上角容易按到。
+#    不使用 ' 是因為書籤類外掛（yamb、bunny）慣例綁定在 ' 上。
+#    若要更換 leader，將本區所有的 "`" 取代即可。
 #
-#  ★ which-key 候選清單的排序是 [which] sort_by 決定的，預設 "none"
-#    = 照這裡的書寫順序顯示，所以下面刻意照「找 → 看 → 改 → 去 → 其他」分組。
+#  which-key 候選清單的排序由 [which] sort_by 決定，預設 "none"
+#    即依此處的定義順序顯示，因此以下依「尋找、檢視、修改、前往、其他」分組。
 # =====================================================================
 
-# --- 找 ---------------------------------------------------------------
+# --- 尋找 -------------------------------------------------------------
 [[mgr.prepend_keymap]]
 on   = [ "`", "f" ]
 run  = [ "arrow top", "plugin smart-filter" ]
@@ -242,7 +235,7 @@ on   = [ "`", "/" ]
 run  = "find --smart"
 desc = "只跳游標不縮清單（n / N 找下一個）"
 
-# --- 看 ---------------------------------------------------------------
+# --- 檢視 -------------------------------------------------------------
 [[mgr.prepend_keymap]]
 on   = [ "`", "i" ]
 run  = "spot"
@@ -263,7 +256,7 @@ on   = [ "`", "w" ]
 run  = "tasks:show"
 desc = "背景工作清單"
 
-# --- 改 ---------------------------------------------------------------
+# --- 修改 -------------------------------------------------------------
 [[mgr.prepend_keymap]]
 on   = [ "`", "a" ]
 run  = "create"
@@ -304,7 +297,7 @@ on   = [ "`", "o" ]
 run  = "open --interactive"
 desc = "選擇用什麼程式開啟"
 
-# --- 去 ---------------------------------------------------------------
+# --- 前往 -------------------------------------------------------------
 [[mgr.prepend_keymap]]
 on   = [ "`", "g" ]
 run  = "cd --interactive"
@@ -337,8 +330,7 @@ on   = [ "`", "?" ]
 run  = "help"
 desc = "完整鍵位表（開啟後按 f 可以過濾）"
 
-# 註：<C-c> 已還原成預設的關閉分頁，這條純粹是查詢表條目
-# （原本是為了補回被 <C-c> 搶走的功能才存在）。
+# 僅作為查詢表項目；<C-c> 已是預設的關閉分頁。
 [[mgr.prepend_keymap]]
 on   = [ "`", "q" ]
 run  = "close"
@@ -348,21 +340,21 @@ desc = "關閉分頁（最後一個分頁則離開 yazi）"
 # =====================================================================
 #  Windows 功能鍵
 #
-#  ★ 解決的問題：yazi 的鍵位是 vim 詞彙表(y=yank d=delete x=cut hjkl=方向)。
-#    沒有 vim 肌肉記憶的話，那不是「難記」，是跟已經會的東西互相打架。
-#    這一區把檔案總管用了二十年的鍵接上去 — 不需要學任何新東西。
+#  用途：yazi 的鍵位採用 vim 慣例（y = yank、d = delete、x = cut、hjkl = 方向），
+#    對不熟悉 vim 的使用者而言，會與既有的操作習慣衝突。
+#    本區加入檔案總管的慣用鍵位，不需學習新操作。
 #
-#  ★ 2026-08-09 瘦身：只留功能鍵與 <Backspace>，Ctrl 系全部退場。
-#    留下來的這幾個成本是零 — 在 26.5.6 的 mgr 層都是空的(逐鍵對照過)，
-#    功能鍵在終端機裡也沒有任何編碼歧義，不需要 kitty keyboard protocol。
-#    被砍的四個(<C-c> <C-x> <C-v> <S-Delete>)每一個都有額外代價，
-#    理由寫在檔案開頭的總覽。<C-a> 預設就是全選，語意跟 Windows 一致，不用改。
+#  只使用功能鍵與 <Backspace>，不使用 Ctrl 組合鍵。
+#    這些鍵在 v26.5.6 的 mgr 層皆未使用（已逐一對照），
+#    功能鍵在終端機中也沒有編碼歧義，不需要 kitty keyboard protocol。
+#    不綁定 <C-c>、<C-x>、<C-v>、<S-Delete> 的原因見檔案開頭的說明。
+#    <C-a> 預設即為全選，與 Windows 一致，不需修改。
 #
-#  ★ 排成一列剛好沒有缺口：F2 改名 / F3 找這一層 / F4 找全機 / F5 重新整理。
+#  功能鍵依序排列：F2 重新命名、F3 在目前目錄搜尋、F4 全機搜尋、F5 重新整理。
 # =====================================================================
 
 # --- 導航 -------------------------------------------------------------
-# 檔案總管的 Backspace = 上一層。接到跟 h / <Left> 同一個外掛，行為一致。
+# 與檔案總管相同，Backspace 回到上一層。使用與 h / <Left> 相同的外掛，行為一致。
 [[mgr.prepend_keymap]]
 on   = "<Backspace>"
 run  = "plugin smart-leave"
@@ -379,33 +371,32 @@ on   = "<Delete>"
 run  = "remove"
 desc = "刪除（進回收桶）"
 
-# 註：永久刪除走預設的 D 或 `D。原本綁的 <S-Delete> 已砍 —
-# 它能不能傳到 yazi 取決於終端機有沒有開 kitty keyboard protocol，
-# 是這一區唯一一個「不保證會動」的鍵，而 D 完全沒有這個問題。
+# 永久刪除請使用預設的 D 或 `D。不綁定 <S-Delete>：
+# 它能否傳到 yazi 取決於終端機是否啟用 kitty keyboard protocol，
+# 無法保證可用，而 D 沒有這個問題。
 
 # --- 搜尋 -------------------------------------------------------------
-# F3：跟 f 是同一個指令，只是接上 Windows 的搜尋直覺。
-# 原本這裡還有一個 <C-f>，三個鍵跑同一件事，已砍 —
-# <C-f> 是搶預設的「往下一頁」搶來的，現在還回去了(跟 <PageDown> 同功能)。
+# F3：與 f 相同的指令，對應 Windows 的搜尋習慣。
+# 不綁定 <C-f>，以保留預設的「下一頁」（與 <PageDown> 相同）。
 [[mgr.prepend_keymap]]
 on   = "<F3>"
 run  = [ "arrow top", "plugin smart-filter" ]
 desc = "在這一層找檔案"
 
-# F4：全機檔名搜尋。F3 找這一層 → F4 往外擴一級，讀起來是連續的。
+# F4：全機檔名搜尋。F3 搜尋目前目錄，F4 擴大到全機，兩者順序連貫。
 #
-# ★ 底層是 voidtools Everything，不是傳統索引 — 它直接讀 NTFS 的 MFT
-#   再訂閱 USN journal，所以沒有「重建索引」這件事，檔案一建立就查得到，
-#   查詢是毫秒級。這也是為什麼敢做成「每敲一個字就重跑一次全機查詢」。
+# 底層為 voidtools Everything，而非傳統索引：它直接讀取 NTFS 的 MFT，
+#   並訂閱 USN journal，因此不需重建索引，檔案建立後即可搜尋到，
+#   查詢僅需數毫秒。因此可以在每輸入一個字元時重新執行全機查詢。
 #
-# ★ 依賴兩個 winget 套件，兩個都要：
-#     voidtools.Everything       主程式(含服務，負責讀 MFT，必須常駐)
-#     voidtools.Everything.Cli   es.exe，CLI 介面
-#   服務沒跑時 es 回 errorlevel 8 且什麼都不印，外掛會偵測並明確報錯，
-#   不會讓你以為是「搜尋不到」。
+# 需要以下兩個 winget 套件：
+#     voidtools.Everything       主程式（含服務，負責讀取 MFT，必須常駐）
+#     voidtools.Everything.Cli   es.exe，命令列介面
+#   服務未執行時，es 回傳 errorlevel 8 且沒有任何輸出；
+#   外掛會偵測此情況並明確顯示錯誤，避免誤以為是搜尋不到結果。
 #
-# ★ Everything 看不到 \\wsl.localhost 的 ext4，也不做內容比對 —
-#   那兩個洞由 s(fd) 與 S(rg) 補，所以那兩個鍵不能砍。
+# Everything 無法搜尋 \\wsl.localhost 的 ext4，也不比對檔案內容，
+#   這兩種情況由 s（fd）與 S（rg）處理，因此這兩個鍵位必須保留。
 [[mgr.prepend_keymap]]
 on   = "<F4>"
 run  = "plugin everything"

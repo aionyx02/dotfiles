@@ -1,23 +1,23 @@
 /*
  * MarkdownPreview 的使用者 CSS 覆寫。
- * 檔名必須是 <parser>.css —— 我們的 parser 設為 "markdown"，所以這支叫 markdown.css。
- * 只有在 MarkdownPreview.sublime-settings 的 allow_css_overrides 為 true 時才會套用。
+ * 檔名必須為 <parser>.css；此處 parser 設為 "markdown"，因此檔名為 markdown.css。
+ * 僅在 MarkdownPreview.sublime-settings 的 allow_css_overrides 為 true 時套用。
  *
- * 目的：讓中文講義的預覽不要出現豆腐字，且排版接近 HackMD。
+ * 目的：避免中文文件的預覽出現缺字方框，並使排版接近 HackMD。
  */
 
 body {
 	font-family:
 		"JetBrains Mono NL",          /* 英數 */
-		"Noto Sans TC",               /* 繁中，你機器上已安裝 */
-		"Microsoft JhengHei",         /* 繁中備援 */
+		"Noto Sans TC",               /* 繁體中文（本機已安裝） */
+		"Microsoft JhengHei",         /* 繁體中文遞補字型 */
 		sans-serif;
 	font-size: 16px;
-	line-height: 1.8;                 /* 中文長文需要比英文更鬆的行距 */
-	max-width: 860px;                 /* 避免在寬螢幕上一行拉太長，難以回行 */
+	line-height: 1.8;                 /* 中文長文需要比英文更寬的行距 */
+	max-width: 860px;                 /* 避免寬螢幕上單行過長而不易閱讀 */
 	margin: 0 auto;
 	padding: 2.5em 2em 6em;
-	letter-spacing: 0.02em;           /* 中英夾雜時稍微鬆一點比較好讀 */
+	letter-spacing: 0.02em;           /* 中英混排時略為加寬字距以利閱讀 */
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -31,7 +31,7 @@ h1, h2 {
 	border-bottom: 1px solid rgba(128, 128, 128, 0.3);
 }
 
-/* 程式碼一律用等寬，不要被上面的中文字型接手 */
+/* 程式碼一律使用等寬字型，不套用上方的中文字型 */
 code, pre, kbd, samp {
 	font-family: "JetBrains Mono NL", "Cascadia Mono", Consolas, monospace;
 	font-size: 0.9em;
@@ -40,11 +40,11 @@ code, pre, kbd, samp {
 pre {
 	line-height: 1.55;
 	padding: 1em;
-	overflow-x: auto;                 /* 長行橫向捲動，不要撐破版面 */
+	overflow-x: auto;                 /* 過長的行改為橫向捲動，避免撐破版面 */
 	border-radius: 6px;
 }
 
-/* 表格：講義裡很常用，給明確框線 */
+/* 表格：加上明確的框線 */
 table {
 	border-collapse: collapse;
 	margin: 1.2em 0;
@@ -65,7 +65,7 @@ th {
 blockquote {
 	margin: 1.2em 0;
 	padding: 0.2em 1.2em;
-	border-left: 4px solid rgba(122, 162, 247, 0.7);   /* Tokyo Night 的藍 */
+	border-left: 4px solid rgba(122, 162, 247, 0.7);   /* Tokyo Night 的藍色 */
 	color: inherit;
 	opacity: 0.9;
 }

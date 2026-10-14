@@ -1,5 +1,5 @@
 {
-	// not_on_caret = 不會清掉你游標正停著那一行的空白，打字時不會被打斷
+	// not_on_caret：不移除游標所在行的行尾空白，避免干擾輸入
 	"trim_trailing_white_space_on_save": "not_on_caret",
 	"ensure_newline_at_eof_on_save": true,
 

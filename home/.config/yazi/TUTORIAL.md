@@ -37,7 +37,7 @@
 
 | 鍵 | 意思 |
 |---|---|
-| `y` | 在 PowerShell 打這個字啟動（不是 `yazi`） |
+| `y` | 在 PowerShell 打這個字啟動（打 `yazi` 也一樣，兩者是同一個指令） |
 | `j` `k` | 上下 |
 | `h` | 回上層 |
 | `l` | 進去 ／ 開檔 |
@@ -529,30 +529,50 @@ yazi 用 `1`~`9`、`[`、`]`、`Ctrl+c` 管它自己的分頁，WezTerm 用 `Ctr
 
 ## 附錄：這份設定改了什麼
 
-只有 5 顆鍵被改過，其餘 100% 是 yazi 原廠預設 —— 所以**按 `~` 叫出的內建說明、以及網路上任何 yazi 教學，對你都完全適用**。
+下表是所有被覆寫或新增的鍵。表上沒有的鍵都是 yazi 原廠預設，所以**按 `~` 叫出的內建說明、以及網路上的 yazi 教學，對那些鍵都適用**。
 
-| 鍵 | 原本 | 改成 |
-|---|---|---|
-| `l` | `enter`（只進目錄） | `smart-enter`（目錄就進、檔案就開） |
-| `Enter` | `open`（只開檔） | `smart-enter`（同上） |
-| `f` | `filter --smart` | `smart-filter`（唯一目錄自動進入） |
-| `p` | `paste`（貼到當前目錄） | `smart-paste`（貼到游標所在目錄） |
-| `T` | 未使用 | `toggle-pane max-preview`（預覽全寬／還原） |
+**覆寫原本的鍵**
+
+| 鍵 | 改成 |
+|---|---|
+| `l` / `Enter` | `smart-enter`：目錄就進、檔案就開 |
+| `h` / `←` | `smart-leave`：回上層；已在 `C:\` 這類最上層時改開磁碟機選單 |
+| `f` | `smart-filter`：游標固定在第一筆，只剩一個目錄時自動進入 |
+| `F` | 內建過濾，但套用後可以自由上下瀏覽 |
+| `s` / `S` | 用 fd／ripgrep 搜尋，**包含隱藏檔**（仍會排除 `.git`，並遵守 `.gitignore`） |
+| `p` | `smart-paste`：貼到游標所在的目錄 |
+
+**新增的鍵**（原廠沒有使用）
+
+| 鍵 | 作用 |
+|---|---|
+| `M` | 磁碟機與 WSL 發行版切換選單 |
+| `T` | 預覽窗全寬／還原 |
+| `!` | 在目前目錄開一個 PowerShell，`exit` 後回到 yazi |
+| `F2` | 改名 |
+| `F3` | 在這一層找檔案（與 `f` 相同） |
+| `F4` | 全機檔名搜尋（Everything），`Ctrl+O` 切換只搜目前目錄，`Ctrl+T` 切換雜訊過濾 |
+| `F5` | 重新整理 |
+| `Delete` | 刪除（進資源回收筒） |
+| `Backspace` | 回上層（與 `h` 相同） |
+| `` ` `` 開頭 | 常用動作的查詢表：按 `` ` `` 後會列出所有選項，忘記鍵位時用 |
 
 另外三項不需按鍵、背景生效：
 
 - **git.yazi** — 檔案列表自動顯示 git 狀態
 - **mime-ext** — 用副檔名判定檔案類型取代讀檔頭嗅探，**讓 yazi 變快**（Windows 沒有 `file(1)`，這是淨收益）
-- **tokyo-night flavor** — 配色對齊 WezTerm，且主檔案區用 `bg = "reset"`，你的 90% 毛玻璃完整保留
+- **tokyo-night flavor** — 配色對齊 WezTerm，且主檔案區用 `bg = "reset"`，WezTerm 的透明背景完整保留
 
-設定檔位置：`C:\Users\shawn\AppData\Roaming\yazi\config\`
+設定檔位置：`C:\Users\shawn\.config\yazi\`（由環境變數 `YAZI_CONFIG_HOME` 指定；
+`%APPDATA%\yazi\config` 也是指向這裡的 junction）
 
 ```
 yazi.toml     預覽品質、Sublime opener、外掛 fetcher 註冊
-keymap.toml   上面那 5 顆鍵
+keymap.toml   上面兩張表的所有鍵
 theme.toml    flavor
-init.lua      git.yazi 初始化
+init.lua      git.yazi 與 mime-ext 初始化
 package.toml  ya pkg 的鎖定檔（記錄外掛版本，勿手改）
+plugins/      drives（M）、everything（F4）、smart-leave（h）是自己寫的，其餘由 ya pkg 安裝
 ```
 
 外掛升級：`ya pkg upgrade`

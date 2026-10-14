@@ -1,27 +1,26 @@
 -- =====================================================================
---  clangd — C / C++
+--  clangd：C / C++
 --
---  ★ 最重要的一件事：clangd 要知道「這個檔案是怎麼編的」才會準。它找的是
---    compile_commands.json。有這個檔的專案，補全與診斷是完全精確的；沒有的
---    話它只能猜，猜不到的 #include 會整片標紅。
+--  clangd 需要知道檔案的編譯方式才能正確分析，資訊來源為 compile_commands.json。
+--    有此檔案時補全與診斷完全精確；沒有時只能推測，
+--    無法解析的 #include 會被標為錯誤。
 --
---      CMake 專案產生的方法：
+--      CMake 專案的產生方式：
 --          cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
---      單檔 / 手寫 Makefile 的專案：在專案根放一個 compile_flags.txt，
---      一行一個編譯參數，例如：
+--      單一檔案或手寫 Makefile 的專案：在專案根目錄建立 compile_flags.txt，
+--      每行一個編譯參數，例如：
 --          -std=c++23
 --          -Wall
 --          -I./include
 -- =====================================================================
 
--- ★ --query-driver 是 mingw 使用者一定要的：你的編譯器是
---   C:\Program Files\mingw64\bin\g++.exe，而 clangd 內建的預設標頭路徑是
---   照 MSVC / libc++ 排的。這個參數讓 clangd 實際去執行一次那個 g++、問它
---   「你的系統 include 路徑有哪些」，然後照抄。沒有這行的話，
---   #include <vector> 這種最基本的一行就會被標成找不到檔案。
+-- 使用 mingw 時必須設定 --query-driver。
+--   本機編譯器為 C:\Program Files\mingw64\bin\g++.exe，而 clangd 預設的標頭路徑
+--   依 MSVC / libc++ 設定。此參數讓 clangd 實際執行一次 g++，取得其系統 include 路徑；
+--   未設定時連 #include <vector> 都會被標為找不到檔案。
 --
--- ★ 路徑要用 glob 而且必須是「絕對路徑」，clangd 不接受相對路徑。
---   VS 2022 的 cl.exe 不需要列 —— clangd 對 MSVC 有內建支援。
+-- 路徑須為 glob 形式的絕對路徑，clangd 不接受相對路徑。
+--   VS 2022 的 cl.exe 不需列出，clangd 已內建 MSVC 支援。
 local drivers = {
   'C:/Program Files/mingw64/bin/*g++.exe',
   'C:/Program Files/mingw64/bin/*gcc.exe',
@@ -32,30 +31,30 @@ return {
   cmd = {
     'clangd',
 
-    -- 背景索引整個專案，跨檔案的「跳到定義 / 找引用」才會準。
-    -- 第一次開大專案時會吃一點 CPU，索引結果快取在 .cache/clangd/。
+    -- 在背景索引整個專案，跨檔案的跳至定義與尋找參照才會準確。
+    -- 首次開啟大型專案時會佔用一些 CPU，索引結果快取於 .cache/clangd/。
     '--background-index',
 
-    -- 順手跑 clang-tidy 的靜態檢查(不只是編譯錯誤，還有「這樣寫有問題」)。
+    -- 同時執行 clang-tidy 靜態檢查（除了編譯錯誤，也檢查有問題的寫法）。
     '--clang-tidy',
 
-    -- 補全選單顯示完整簽名(回傳型別 + 參數)，不是只有函式名。
+    -- 補全選單顯示完整簽名（回傳型別與參數），而非只有函式名稱。
     '--completion-style=detailed',
 
-    -- ★ 刻意關掉自動插入 #include。開著的話，你選一個 std::vector，clangd
-    --   會順手在檔案最上面插一行 #include <vector> —— 那是「補全順便改了
-    --   你沒在看的地方」。跟 completeopt 裡 noselect 的理由是同一個：
-    --   選字就只做選字。要它幫你補 include 時，用 gra(code action) 明確叫。
+    -- 停用自動插入 #include。
+    --   啟用時選擇 std::vector 會在檔案開頭自動加入 #include <vector>，
+    --   等於補全時修改了畫面外的內容。理由與 completeopt 的 noselect 相同：
+    --   選擇補全項目時不應有其他副作用。需要補上 include 時，以 gra（code action）明確執行。
     '--header-insertion=never',
 
-    -- ★ 關掉參數佔位符。開著的話選 push_back 會插入
+    -- 停用參數佔位符。
+    --   啟用時選擇 push_back 會插入
     --       nums.push_back(const int &Val)
-    --   那串 const int &Val 是「已選取的佔位文字」，你接著打字會蓋掉它 ——
-    --   但只要你這時按了 <Esc>(而按 Esc 是 vim 使用者的反射動作)，那串字就
-    --   原封不動留在程式碼裡了。關掉之後插入的是 push_back()，游標停在括號
-    --   中間，乾淨且沒有這個陷阱。
-    --   想知道參數有哪些：insert mode 按 <C-s>(nvim 內建的參數提示鍵)。
-    --   要改回來的話把下面這行刪掉即可。
+    --   其中 const int &Val 為已選取的佔位文字，繼續輸入即可覆蓋；
+    --   但若此時按下 <Esc>，佔位文字就會原樣留在程式碼中。
+    --   停用後插入 push_back()，游標停在括號中間。
+    --   查看參數：在 insert 模式按 <C-s>（nvim 內建的參數提示鍵）。
+    --   刪除下面這行即可恢復預設行為。
     '--function-arg-placeholders=0',
 
     '--query-driver=' .. table.concat(drivers, ','),

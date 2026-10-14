@@ -1,6 +1,6 @@
 [
 	// ── Markdown 預覽 ──────────────────────────────────────────
-	// Alt+M：用瀏覽器開啟預覽（只在 Markdown 檔案裡生效，不會污染其他語言）
+	// Alt+M：以瀏覽器開啟預覽（僅在 Markdown 檔案中生效）
 	{
 		"keys": ["alt+m"],
 		"command": "markdown_preview",

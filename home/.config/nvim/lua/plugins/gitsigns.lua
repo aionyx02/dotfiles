@@ -1,10 +1,10 @@
 -- =====================================================================
---  gitsigns — 在左邊那一欄標出這個檔案改了哪幾行
+--  gitsigns：在左側標記欄顯示目前檔案有變更的行
 --
---  ★ 只綁 ]c / [c 兩個鍵，跳到下一處 / 上一處改動。
---    這兩個是 vim 原生 diff 模式的跳轉鍵，在非 diff 模式下本來就沒有作用，
---    所以借用它們不覆蓋任何東西 —— 而且語意一模一樣，是最自然的接法。
---    (在真正的 diff 模式裡我們把它還回去，見下方的 vim.wo.diff 判斷。)
+--  只綁定 ]c / [c，跳至下一處／上一處變更。
+--    這兩個是 vim 原生 diff 模式的跳轉鍵，在非 diff 模式下沒有作用，
+--    因此借用它們不會覆蓋任何功能，且語意相同。
+--    在 diff 模式中仍保留原生行為，見下方的 vim.wo.diff 判斷。
 -- =====================================================================
 
 return {
@@ -15,12 +15,12 @@ return {
       on_attach = function(bufnr)
         local gs = require('gitsigns')
 
-        -- gitsigns 在 v1.0 把 next_hunk/prev_hunk 換成了 nav_hunk。
-        -- 兩個都試，將來哪一邊被拿掉都不會壞。
+        -- gitsigns v1.0 以 nav_hunk 取代 next_hunk / prev_hunk。
+        -- 兩者都支援，日後任一方被移除時仍可運作。
         local function nav(direction, fallback)
           return function()
             if vim.wo.diff then
-              -- 真的在 diff 模式時，把鍵還給 vim 原生行為
+              -- 在 diff 模式中使用 vim 原生行為
               vim.cmd.normal({ args = { direction == 'next' and ']c' or '[c' }, bang = true })
               return
             end

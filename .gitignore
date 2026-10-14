@@ -78,24 +78,24 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 
-# ── JetBrains 專案目錄（原本這行是 UTF-16LE 亂碼，git 讀不到）─────────
+# ── JetBrains 專案目錄 ────────────────────────────────────────────────
 /.idea/
 
-# ── dotfiles 自身 ────────────────────────────────────────────────────
-# install.ps1 的備份是放在 ~/.dotfiles-backup/，不在 repo 內；此處為誤放時的保險
+# ── dotfiles 本身 ─────────────────────────────────────────────────────
+# install.ps1 的備份位於 ~/.dotfiles-backup/，不在 repo 內；此規則用於防止誤放
 .dotfiles-backup/
 
-# PowerShell profile 的手動備份（歷史交給 git，不再留 .bak）
+# PowerShell profile 的手動備份（版本歷史由 git 管理，不保留 .bak）
 home/.config/powershell/*.bak*
 
-# Sublime：Package Control 的執行期狀態，不是設定
+# Sublime：Package Control 的執行期狀態，不屬於設定
 home/AppData/Roaming/Sublime Text/Packages/User/Package Control.last-run
 home/AppData/Roaming/Sublime Text/Packages/User/oscrypto-ca-bundle.crt
 home/AppData/Roaming/Sublime Text/Packages/User/*.cache
 
-# ── 安全網 ───────────────────────────────────────────────────────────
-# ~/.config/claude/ 是檔案層 symlink，憑證本來就不在 repo 內。
-# 這幾條是「哪天手滑把整個目錄拖進來」時的最後一道防線。
+# ── 敏感檔案防護 ──────────────────────────────────────────────────────
+# ~/.config/claude/ 以檔案層級的 symlink 部署，憑證本來就不在 repo 內。
+# 以下規則用於防止整個目錄被誤加入 repo。
 **/.credentials.json
 **/.claude.json
 **/history.jsonl

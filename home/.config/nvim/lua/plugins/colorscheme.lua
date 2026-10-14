@@ -1,14 +1,13 @@
 -- =====================================================================
---  tokyonight — 對齊 WezTerm 與 starship
+--  tokyonight：與 WezTerm、starship 配色一致
 --
---  ★ style = 'night' 的背景色是 #1a1b26，跟你 wezterm.lua 裡自訂的
---    ['Tokyo Night'] 那組 background 完全同一個色號，所以兩邊接得上。
+--  style = 'night' 的背景色為 #1a1b26，與 wezterm.lua 中自訂的
+--    ['Tokyo Night'] background 相同。
 --
---  ★ transparent 保持 false(實色)。你的 WezTerm 是 window_background_opacity
---    = 0.90 的玻璃，開 transparent 會讓玻璃感延伸進 nvim，但代價是整片
---    程式碼都飄在桌面上 —— 你在 wezterm.lua 裡替 tab bar 加襯底時已經寫過
---    這個坑(細字背後一亮就消失)。而且 CursorLine / Visual / Search 這些
---    靠背景色區分的東西會一起變弱。
+--  transparent 保持 false（不透明）。WezTerm 的 window_background_opacity 為 0.90，
+--    開啟 transparent 雖可延續透明效果，但程式碼會直接疊在桌面背景上，
+--    背景明亮時文字難以辨識（與 wezterm.lua 中分頁列背景色的考量相同）；
+--    CursorLine、Visual、Search 等依靠背景色區分的元素也會變得不明顯。
 -- =====================================================================
 
 return {

@@ -1,8 +1,8 @@
 {
-	// 離線渲染，不呼叫 GitHub API：不需網路、沒有 60 次/小時的速率限制
+	// 在本機算繪，不呼叫 GitHub API：不需要網路，也沒有每小時 60 次的速率限制
 	"parser": "markdown",
 
-	// 貼近 HackMD (GFM) 的擴充功能
+	// 啟用接近 HackMD（GFM）的擴充功能
 	"enable_highlight": true,
 	"markdown_extensions":
 	[
@@ -41,7 +41,7 @@
 		},
 	],
 
-	// 中文講義：CJK 字型 fallback，避免預覽出現豆腐字
+	// 中文文件：設定 CJK 遞補字型，避免預覽出現缺字方框
 	"css":
 	[
 		"default",
@@ -51,7 +51,7 @@
 	// 存檔時自動更新已開啟的預覽分頁
 	"enable_autoreload": true,
 
-	// 預覽輸出到暫存檔，不會在你的專案資料夾留下 .html 垃圾
+	// 預覽輸出至暫存檔，不會在專案資料夾中產生 .html 檔
 	"build_action": "browser",
 	"image_path_conversion": "absolute",
 	"file_path_conversions": "absolute",

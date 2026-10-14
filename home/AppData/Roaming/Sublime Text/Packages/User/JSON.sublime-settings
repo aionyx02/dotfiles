@@ -1,6 +1,6 @@
 {
-	// 設定檔（.claude/settings.json、package.json…）：存檔自動清尾隨空白
-	// 這裡開啟是安全的 —— JSON 的空白沒有語意
+	// 設定檔（.claude/settings.json、package.json 等）：存檔時自動移除行尾空白
+	// JSON 中的空白沒有語意，因此可安全啟用
 	"trim_trailing_white_space_on_save": "all",
 	"ensure_newline_at_eof_on_save": true,
 

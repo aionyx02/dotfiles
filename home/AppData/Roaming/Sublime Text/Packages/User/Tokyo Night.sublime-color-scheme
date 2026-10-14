@@ -1,12 +1,12 @@
 {
 	"name": "Tokyo Night",
-	// 色值直接取自 C:\Users\shawn\.config\wezterm\wezterm.lua 的 config.color_schemes['Tokyo Night']
-	// 目的：WezTerm 與 Sublime 完全同色。日後改動終端機色盤時，這裡要一起改。
+	// 色值取自 C:\Users\shawn\.config\wezterm\wezterm.lua 的 config.color_schemes['Tokyo Night']
+	// 目的：使 WezTerm 與 Sublime 配色一致。修改終端機色票時須一併修改此處。
 	"author": "generated to match wezterm.lua",
 
 	"variables":
 	{
-		// ── 來自 wezterm.lua 的原始值 ──
+		// ── 取自 wezterm.lua 的色值 ──
 		"bg":          "#1a1b26",
 		"fg":          "#a9b1d6",
 		"cursor":      "#c0caf5",
@@ -21,7 +21,7 @@
 		"cyan":        "#7dcfff",
 		"white":       "#c0caf5",
 
-		// ── 由上述色值推導的輔助色（UI 用，非語法著色）──
+		// ── 由上述色值推導的輔助色（供介面使用，不用於語法著色）──
 		"line_hl":     "#24283b",
 		"gutter_fg":   "#3b4261",
 		"guide":       "#292e42",
@@ -140,14 +140,14 @@
 			"background": "var(red)",
 		},
 
-		// ── JSON / YAML 設定檔：鍵名要一眼可辨 ──
+		// ── JSON / YAML 設定檔：突顯鍵名 ──
 		{
 			"name": "JSON / YAML key",
 			"scope": "meta.mapping.key string, entity.name.tag.yaml, support.type.property-name",
 			"foreground": "var(blue)",
 		},
 
-		// ── Markdown：你的主要用途，特別調校 ──
+		// ── Markdown：主要使用情境，另行調整 ──
 		{
 			"name": "Markdown 標題",
 			"scope": "markup.heading, entity.name.section",

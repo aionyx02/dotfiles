@@ -18,7 +18,9 @@
 | `starship init powershell` 印出的東西自己又會再 spawn 一次 `--print-full-init` | 直接快取 full-init，省掉兩次 spawn |
 | `Get-Item` 走 FileSystem provider，每次要建 PSObject 並做 ACL／reparse 檢查（四次檢查實測 ~144ms） | 改用 `[IO.File]::Exists` 等 .NET 靜態方法 |
 
-**快取失效條件**：對應的 exe 比快取檔新，或快取檔不存在 → 自動重建。
+**快取失效條件**：
+- `tools.ps1`：快取檔不存在，或記錄的任一路徑已不存在 → 重新解析。所以「先開過 shell、之後才裝 zoxide」也會在下次開 shell 時自動修好。工具真的沒裝時，每次開 shell 都會重新解析一次（約 180ms），直到裝好為止。
+- starship／zoxide 的初始化腳本：對應的 exe 比快取檔新，或快取檔不存在 → 自動重建。
 **手動重建**：`Remove-Item ~/.cache/pwsh-init -Recurse`
 
 ---
@@ -40,8 +42,8 @@ JediTerm 版比較精簡——IDE 內嵌終端寬度窄，段落太多會擠爆�
 
 ## 其他
 
-- **PATH 補丁** — 7-Zip（yazi 的壓縮檔預覽與 `ya pub extract` 都呼叫 `7z`）與 Sublime Text（`yazi.toml` 的 edit opener 設為 `subl`）裝好了卻不在 PATH 上，這裡補進去。winget 裝的工具（含 ffmpeg／ffprobe）已改由 `~\.local\bin` 的硬連結統一供應，那個目錄本來就在 User PATH 上。
+- **PATH** — 本檔不修改 PATH。7-Zip（yazi 的壓縮檔預覽與 `ya pub extract` 都呼叫 `7z`）與 Sublime Text（`yazi.toml` 的 edit opener 設為 `subl`）的安裝程式不會自己加進 PATH，改由 `install.ps1` 寫進 User PATH（登錄檔），`-Verify` 會檢查。
 - **zoxide** — `_ZO_EXCLUDE_DIRS` 排除掉 `$HOME`、各種 AppData、`C:\Windows` 與 OneDrive，避免資料庫被雜訊灌爆。
-- **`y` 函式** — 啟動 yazi，離開（`q`）時 shell 自動 `cd` 到你最後所在的目錄。官方 `--cwd-file` 寫法。裡面兩個看似多餘的防禦都是踩過的坑：
+- **`y` 函式與 `yazi` 別名** — 啟動 yazi，離開（`q`）時 shell 自動 `cd` 到你最後所在的目錄。官方 `--cwd-file` 寫法。`Set-Alias yazi y` 讓直接打 `yazi` 也走這個函式（`yazi.exe` 是子行程，自己無法改變 shell 的目錄）；因此函式內部必須明確呼叫 `yazi.exe`，否則會遞迴呼叫自己。裡面兩個看似多餘的防禦都是踩過的坑：
   - `Test-Path` 檢查：在 yazi 裡把當前目錄刪掉再離開時，cwd-file 記的是已不存在的路徑
   - `finally` 區塊：yazi 執行中按 `Ctrl+C` 會中止整個函式，沒有它的話 `GetTempFileName()` 建的實體檔案會一直堆積在 `%TEMP%`

@@ -103,3 +103,8 @@ home/AppData/Roaming/Sublime Text/Packages/User/*.cache
 **/*.pem
 .env
 .env.*
+
+# ── Claude Code 自動同步的 skill 快取 ───────────────────────────────
+# claude.ai 帳號層級的 skill 由 Claude Code 自動下載到 skills/synced/，
+# 每次同步都會改寫，內容不屬於本 repo 的設定。
+home/.config/claude/skills/synced/

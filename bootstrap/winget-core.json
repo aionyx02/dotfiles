@@ -17,6 +17,7 @@
         { "PackageIdentifier": "jqlang.jq" },
         { "PackageIdentifier": "oschwartz10612.Poppler" },
         { "PackageIdentifier": "ImageMagick.ImageMagick" },
+        { "PackageIdentifier": "hpjansson.Chafa" },
         { "PackageIdentifier": "voidtools.Everything" },
         { "PackageIdentifier": "voidtools.Everything.Cli" },
         { "PackageIdentifier": "Neovim.Neovim" },

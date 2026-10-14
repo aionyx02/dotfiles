@@ -172,6 +172,8 @@ $CoreTools = @(
     'rg', 'fd', '7z', 'nvim', 'git', 'gh', 'subl',
     # yazi 預覽與搜尋所需：影片縮圖、JSON、PDF、SVG／HEIC／字型、全機檔名搜尋
     'ffmpeg', 'jq', 'pdftoppm', 'magick', 'es',
+    # yazi 在 nvim 中預覽圖片（nvim 終端機不支援圖形協定，只能以字元近似）
+    'chafa',
     'node', 'cargo', 'ccstatusline', 'rtk', 'claude',
     # nvim 的 LSP
     'uv', 'lua-language-server', 'basedpyright-langserver', 'ruff'

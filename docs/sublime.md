@@ -2,7 +2,9 @@
 
 `%APPDATA%\Sublime Text\Packages\User` 整包 symlink。15 個檔、約 23 KB。
 
-Sublime 是 `settings.json` 裡設定的 `EDITOR`（`subl -w`），也是 `yazi.toml` 的 edit opener，所以它的路徑會被 `profile.ps1` 補進 PATH。
+Sublime 是 `settings.json` 裡設定的 `EDITOR`（`subl -w`），也是 `yazi.toml` 的 edit opener，所以它的安裝目錄必須在 PATH 上。安裝程式不會自己加，由 `install.ps1` 寫進 User PATH。
+
+`C++17.sublime-build` 以 Sublime 的 `$packages` 變數指向 `sublime-cpp-build.ps1`，不寫死使用者目錄，換機器或換使用者名稱都不用改。
 
 ---
 

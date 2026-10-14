@@ -5,7 +5,7 @@
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+        "$packages\\User\\sublime-cpp-build.ps1",
         "-Mode",
         "BuildRun",
         "$file"
@@ -25,7 +25,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+                "$packages\\User\\sublime-cpp-build.ps1",
                 "-Mode",
                 "Compile",
                 "$file"
@@ -39,7 +39,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+                "$packages\\User\\sublime-cpp-build.ps1",
                 "-Mode",
                 "RunOnly",
                 "$file"
@@ -53,7 +53,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+                "$packages\\User\\sublime-cpp-build.ps1",
                 "-Mode",
                 "Terminal",
                 "$file"
@@ -67,7 +67,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "C:\\Users\\shawn\\AppData\\Roaming\\Sublime Text\\Packages\\User\\sublime-cpp-build.ps1",
+                "$packages\\User\\sublime-cpp-build.ps1",
                 "-Mode",
                 "RunOnlyTerminal",
                 "$file"

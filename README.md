@@ -174,6 +174,7 @@ cd D:\Project\dotfiles; .\install.ps1
 | `Everything.ini` | 20 KB 全是視窗位置與索引狀態 |
 | 憑證、session、快取 | 見 `.gitignore` 的「安全網」段 |
 | 字型檔本體 | 128 個 ttf、上百 MB；改由 winget 的 `DEVCOM.JetBrainsMonoNerdFont` 安裝 |
+| miniforge3 與 conda 環境 | Python 刻意分兩套：一般與大型專案用 uv（`uv venv` + `uv sync`），機器學習與資料科學用 miniforge 的 conda 環境（`data-science`、`deep-learning`）。環境內容屬於各專案，不是設定 |
 
 `$PROFILE` 的兩支 bootstrap（`Documents\PowerShell\` 與 `Documents\WindowsPowerShell\`）也不在此管理——它們在 OneDrive 同步範圍內，重灌登入後會自己回來。內容見下方附錄。
 

@@ -1,20 +1,38 @@
 -- =====================================================================
---  yazi.nvim — 在 nvim 裡叫出你已經很熟的 yazi 來換檔案
+--  yazi.nvim：在 nvim 中開啟 yazi 切換檔案
 --
---  ★ plenary 是 yazi.nvim 的依賴(用來解析路徑)。lazy.nvim 會自動幫使用者
---    裝依賴，但我們用的是內建的 vim.pack，所以要自己列出來 —— 這是
---    yazi.nvim 的 README 明講的。所以這個功能實際成本是 2 個外掛。
+--  plenary 是 yazi.nvim 的相依套件（用於解析路徑）。lazy.nvim 會自動安裝相依套件，
+--    但內建的 vim.pack 不會，因此須自行列出（yazi.nvim 的 README 亦有說明）。
+--    此功能實際佔用 2 個外掛。
 --
---  ★ Windows 支援：作者明確標示最低需求是 Windows 11(這台符合)。
---    有問題時打 :checkhealth yazi 會告訴你 yazi 版本、依賴到不到位。
+--  Windows 支援：作者標示的最低需求為 Windows 11。
+--    遇到問題時可執行 :checkhealth yazi，檢查 yazi 版本與相依項目。
 --
---  ★ 已知的小洞：yazi.nvim 的「複製相對路徑」功能需要 realpath 這個指令，
---    Windows 上你的 PATH 沒有(Git for Windows 有附但沒暴露出來)。
---    其他功能都不受影響。
+--  已知限制：「複製相對路徑」功能需要 realpath 指令，
+--    Windows 的 PATH 上沒有此指令（Git for Windows 有附帶，但未加入 PATH）。
+--    其他功能不受影響。
 --
---  ★ open_for_directories 保持 false(預設)。開了會讓 `nvim 某目錄`
---    直接跳 yazi、取代 nvim 內建的 netrw —— 那是覆蓋原生行為，
---    跟這份設定「原生優先」的原則不合。要瀏覽目錄就按 \y。
+--  open_for_directories = true：`nvim <目錄>`、`nvim .`、`:e <目錄>` 一律改開 yazi。
+--    這是「原生優先」原則的刻意例外（2026-10-14 使用者明確要求），
+--    代價是 netrw 整個停用，:Explore 等指令不再存在。
+--    vim.g.loaded_netrwPlugin 是 README 建議的寫法：讓 netrw 完全不載入，
+--    而不是載入後再被攔截（見 yazi.nvim issue #802）。
+--    此 config 在 init.lua 執行期間就會跑，早於 runtime 的 plugin/ 載入，因此能及時生效。
+--
+--  圖片預覽：nvim 內建終端機不支援任何圖形協定，只能讓 yazi 改用 chafa
+--    以字元近似顯示（winget 安裝的 hpjansson.Chafa，需 >= 1.16）。
+--    要看原始畫質，請直接在 WezTerm 中執行 yazi。
+--
+--    但僅安裝 chafa 不會生效：nvim 的 job 會繼承 WezTerm 設定的
+--    TERM_PROGRAM、WEZTERM_* 等環境變數，yazi 依此判定自己在 WezTerm 中
+--    （yazi --debug 顯示 Brand.from_env = WezTerm、Adapter = Iip），
+--    送出的圖片資料被 nvim 終端機直接丟棄，預覽欄一片空白。
+--    只清除 TERM_PROGRAM 仍不夠，WEZTERM_* 也會被判定；全部清除後 Adapter 才會變為 Chafa
+--    （2026-10-14 以 headless nvim 的 term job 實測）。
+--
+--    yazi.nvim 沒有提供設定 yazi 環境變數的選項，因此包裝 require('yazi').yazi：
+--    \y、\Y、:Yazi toggle、開啟目錄最後都會呼叫它，且 jobstart 在其中同步執行，
+--    只需在呼叫期間暫時移除這些變數，結束後立即還原，nvim 其他 job 不受影響。
 -- =====================================================================
 
 return {
@@ -24,24 +42,42 @@ return {
   },
 
   config = function()
+    vim.g.loaded_netrwPlugin = 1
+
     require('yazi').setup({
-      open_for_directories = false,
+      open_for_directories = true,
 
       keymaps = {
-        -- ★ 這個功能(複製相對路徑)需要 realpath，Windows 上沒有。
-        --   關掉它是官方 healthcheck 建議的做法(原始碼裡 false 就是停用值)，
-        --   不關的話 :checkhealth yazi 會一直掛一個永遠修不好的警告，
-        --   久了你就會忽略整份健檢報告 —— 那才是真正的損失。
+        -- 停用「複製相對路徑」：此功能需要 realpath，Windows 上沒有。
+        --   這是官方 healthcheck 建議的做法（原始碼中 false 即為停用）；
+        --   若不停用，:checkhealth yazi 會持續顯示一個無法修復的警告。
         copy_relative_path_to_selected_files = false,
       },
 
-      -- yazi 裡選了檔案之後要用什麼方式開。保持預設(取代當前 buffer)，
-      -- 這裡寫出來是為了讓你知道有這個開關。
+      -- 在 yazi 目前所在目錄或選取的檔案中進行全文搜尋時，使用 fzf-lua。
       integrations = {
-        -- 在 yazi 當下所在的目錄做全文搜尋時，用我們已經裝了的 fzf-lua。
         grep_in_directory = 'fzf-lua',
         grep_in_selected_files = 'fzf-lua',
       },
     })
+
+    local yazi = require('yazi')
+    local launch = yazi.yazi
+    ---@diagnostic disable-next-line: duplicate-set-field
+    yazi.yazi = function(...)
+      local saved = {}
+      for name in pairs(vim.fn.environ()) do
+        if name == 'TERM_PROGRAM' or name == 'TERM_PROGRAM_VERSION' or name:match('^WEZTERM_') then
+          saved[name] = vim.env[name]
+          vim.env[name] = nil
+        end
+      end
+      -- 即使 launch 出錯也要還原環境變數，錯誤再原樣拋出
+      local ok, err = pcall(launch, ...)
+      for name, value in pairs(saved) do
+        vim.env[name] = value
+      end
+      if not ok then error(err, 0) end
+    end
   end,
 }

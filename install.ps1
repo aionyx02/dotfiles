@@ -96,6 +96,15 @@ $ExtraLinks = @(
         Kind   = 'Junction'
         Label  = 'yazi 預設設定位置'
     }
+    # 正本在另一個 repo（aionyx02/claude-review-workflow，需 clone 到本 repo 旁邊）。
+    # Target 刻意放在 repo 內而非 $HOME：~/.config/claude/skills 本身是連到這裡的
+    # 主要連結，且排在 $ExtraLinks 之後才建立。已列入 .gitignore。
+    [pscustomobject]@{
+        Target = Join-Path $RepoHome '.config\claude\skills\setup-review-pipeline'
+        Source = Join-Path (Split-Path $RepoRoot) 'claude-review-workflow\setup-review-pipeline'
+        Kind   = 'Junction'
+        Label  = 'skill setup-review-pipeline'
+    }
 )
 
 # ── 使用者環境變數 ────────────────────────────────────────────────────
@@ -492,6 +501,13 @@ foreach ($p in $plan) {
     $lt = Get-LinkTarget $p.Target
     if ($lt -and (Test-SameTarget $lt $p.Source)) {
         Write-Item Skip $label '已是正確的 link'
+        $stats.Skipped++
+        continue
+    }
+
+    # 來源在其他 repo 時可能尚未 clone，略過而不是建出斷鏈
+    if (-not (Test-Path -LiteralPath $p.Source)) {
+        Write-Item Warn $label "來源不存在，略過：$($p.Source)"
         $stats.Skipped++
         continue
     }

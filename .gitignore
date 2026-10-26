@@ -108,3 +108,7 @@ home/AppData/Roaming/Sublime Text/Packages/User/*.cache
 # claude.ai 帳號層級的 skill 由 Claude Code 自動下載到 skills/synced/，
 # 每次同步都會改寫，內容不屬於本 repo 的設定。
 home/.config/claude/skills/synced/
+
+# ── 外部 repo 管理的 skill ─────────────────────────────────────────
+# 正本在 aionyx02/claude-review-workflow，由 install.ps1 的 $ExtraLinks 建 junction 接進來。
+home/.config/claude/skills/setup-review-pipeline

@@ -44,6 +44,7 @@ JediTerm 版比較精簡——IDE 內嵌終端寬度窄，段落太多會擠爆�
 
 - **PATH** — 本檔不修改 PATH。7-Zip（yazi 的壓縮檔預覽與 `ya pub extract` 都呼叫 `7z`）與 Sublime Text（`yazi.toml` 的 edit opener 設為 `subl`）的安裝程式不會自己加進 PATH，改由 `install.ps1` 寫進 User PATH（登錄檔），`-Verify` 會檢查。
 - **zoxide** — `_ZO_EXCLUDE_DIRS` 排除掉 `$HOME`、各種 AppData、`C:\Windows` 與 OneDrive，避免資料庫被雜訊灌爆。
+- **`sn`** — snippet 管理，dot-source `D:\Project\snippets\sn.ps1`（獨立 repo `aionyx02/snippets`，snippet 內容在該 repo 的 `data/`，不進 git）。檔案不存在就略過，所以沒 clone 也不會報錯。`SN_EDITOR=nvim` 讓它不跟著 `EDITOR`（Claude Code 設的 `subl -w`）走。
 - **`y` 函式與 `yazi` 別名** — 啟動 yazi，離開（`q`）時 shell 自動 `cd` 到你最後所在的目錄。官方 `--cwd-file` 寫法。`Set-Alias yazi y` 讓直接打 `yazi` 也走這個函式（`yazi.exe` 是子行程，自己無法改變 shell 的目錄）；因此函式內部必須明確呼叫 `yazi.exe`，否則會遞迴呼叫自己。裡面兩個看似多餘的防禦都是踩過的坑：
   - `Test-Path` 檢查：在 yazi 裡把當前目錄刪掉再離開時，cwd-file 記的是已不存在的路徑
   - `finally` 區塊：yazi 執行中按 `Ctrl+C` 會中止整個函式，沒有它的話 `GetTempFileName()` 建的實體檔案會一直堆積在 `%TEMP%`

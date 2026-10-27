@@ -114,6 +114,16 @@ function y {
 Set-Alias yazi y
 
 # =====================================================================
+# Snippets
+# =====================================================================
+# sn：fzf 挑 snippet、Enter 複製。工具在獨立 repo，內容存本地不上傳。說明見該 repo 的 README。
+# 該檔載入時只定義函式，不啟動外部程式。
+# SN_EDITOR 優先於 EDITOR（後者由 Claude Code 設為 subl -w）：snippet 在終端機裡就地編輯。
+$env:SN_EDITOR = 'nvim'
+$snScript = 'D:\Project\snippets\sn.ps1'
+if ([IO.File]::Exists($snScript)) { . $snScript }
+
+# =====================================================================
 # Get-ChildItem 的資料夾顏色
 # =====================================================================
 # PowerShell 7.2+ 預設資料夾為 `e[44;1m（藍色背景＋粗體），在 Tokyo Night 的淺藍
